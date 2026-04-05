@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="theme-color" content="#0a1220">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<title>東上空気 TOJO KUKI</title>
+<title>東上空気 ｜ 東武東上線 遅延リスク</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚃</text></svg>">
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;600;700&display=swap');
@@ -72,6 +72,19 @@
     background: linear-gradient(180deg, #0a1828 0%, var(--bg) 100%);
     text-align: center;
   }
+  .risk-hero-line-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: rgba(42,157,143,0.12); border: 1px solid rgba(42,157,143,0.35);
+    border-radius: 20px; padding: 4px 14px;
+    font-size: 12px; font-weight: 700; color: var(--accent);
+    letter-spacing: 0.5px; margin-bottom: 14px;
+  }
+  .risk-hero-line-badge .badge-dot {
+    width: 7px; height: 7px; border-radius: 50%; background: var(--accent);
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(0.8)} }
+
   .risk-hero-date {
     font-size: 11px; color: var(--text2); letter-spacing: 0.5px; margin-bottom: 10px;
   }
@@ -243,8 +256,11 @@
 <div class="screen active" id="screen-home">
 
   <div class="risk-hero">
+    <div class="risk-hero-line-badge">
+      <span class="badge-dot"></span>東武東上線
+    </div>
     <div class="risk-hero-date" id="riskHeroDate"></div>
-    <div class="risk-hero-label">TODAY&#39;S DELAY RISK ／ 大規模遅延リスク</div>
+    <div class="risk-hero-label">大規模遅延リスク予測</div>
     <div class="risk-hero-num-row">
       <div class="risk-hero-num" id="riskHeroNum">--</div>
       <div class="risk-hero-sym">%</div>
@@ -283,7 +299,7 @@
 <div class="screen" id="screen-forecast">
   <div class="forecast-header">
     <h1>&#x1F4C5; 2026年 遅延予報</h1>
-    <div class="fh-sub">月別・曜日別の大規模遅延リスク予測（統計ベース）</div>
+    <div class="fh-sub">東武東上線 ｜ 月別・曜日別の大規模遅延リスク予測（統計ベース）</div>
   </div>
 
   <div class="fc-section">
@@ -315,9 +331,12 @@
 <div class="screen" id="screen-about">
   <div class="about-content">
     <h2>東上空気について</h2>
+    <p style="font-size:13px;color:var(--accent);font-weight:600;margin-bottom:8px">
+      &#x1F68B; 東武東上線 専用の遅延リスク可視化ツール
+    </p>
     <p>
-      東武東上線の<strong>大規模遅延リスクを統計的に可視化する</strong>ツールです。
-      「今日、電車が大幅に遅れる可能性はどのくらいか」を毎日計算して表示します。
+      池袋〜寄居間を走る東武東上線の<strong>大規模遅延リスクを統計的に予測</strong>します。
+      「今日、30分超の遅延や運転見合わせが起きる可能性はどのくらいか」を毎朝計算して表示します。
     </p>
 
     <div class="stat-grid">
@@ -372,7 +391,7 @@
     </div>
 
     <p style="font-size:11px;color:var(--text2)">
-      東上空気プロジェクト | 東武東上線 遅延リスク可視化ツール
+      東上空気プロジェクト | 東武東上線（池袋〜寄居）遅延リスク可視化ツール
     </p>
   </div>
 </div>
