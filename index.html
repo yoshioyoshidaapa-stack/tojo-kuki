@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#0a1220">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <title>東上空気 TOJO KUKI</title>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌙</text></svg>">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚃</text></svg>">
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;600;700&display=swap');
 
@@ -56,221 +56,109 @@
   .nav-item.active { color: var(--accent); }
   .nav-item:active { transform: scale(0.92); }
 
-  /* ── Home Screen ── */
-  .home-hero {
-    padding: 48px 24px 24px;
-    text-align: center;
-    background: linear-gradient(180deg, #0f1f30 0%, var(--bg) 100%);
+  /* ── Late night ── */
+  .late-night-indicator {
+    display: none; text-align: center; padding: 8px;
+    font-size: 11px; color: var(--warm);
+    background: rgba(232,193,112,0.06);
+    border-bottom: 1px solid rgba(232,193,112,0.1);
   }
-  .home-hero .logo { font-size: 36px; margin-bottom: 8px; }
-  .home-hero h1 { font-size: 24px; font-weight: 700; color: #fff; letter-spacing: 1px; }
-  .home-hero .tagline { font-size: 13px; color: var(--text2); margin-top: 6px; line-height: 1.6; }
+  body.late-night { --accent: #e8c170; --card: #14202e; }
+  body.late-night .late-night-indicator { display: block; }
 
-  .global-pulse {
-    margin: 20px 20px 0;
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 20px;
+  /* ── Risk Hero ── */
+  .risk-hero {
+    padding: 36px 20px 20px;
+    background: linear-gradient(180deg, #0a1828 0%, var(--bg) 100%);
     text-align: center;
   }
-  .global-pulse .pulse-num { font-size: 48px; font-weight: 700; color: var(--accent); }
-  .global-pulse .pulse-label { font-size: 12px; color: var(--text2); margin-top: 4px; }
-  .pulse-dot {
-    display: inline-block; width: 8px; height: 8px; border-radius: 50%;
-    background: var(--accent); margin-right: 6px;
-    animation: pulse 2s infinite;
+  .risk-hero-date {
+    font-size: 11px; color: var(--text2); letter-spacing: 0.5px; margin-bottom: 10px;
   }
-  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(0.8)} }
+  .risk-hero-label {
+    font-size: 10px; color: var(--text2); letter-spacing: 1.5px; font-weight: 600;
+    text-transform: uppercase; margin-bottom: 6px;
+  }
+  .risk-hero-num-row {
+    display: flex; align-items: flex-end; justify-content: center; gap: 4px;
+    margin: 4px 0 6px;
+  }
+  .risk-hero-num {
+    font-size: 96px; font-weight: 700; line-height: 1;
+    transition: color 0.4s; letter-spacing: -4px;
+  }
+  .risk-hero-sym { font-size: 36px; font-weight: 500; color: var(--text2); padding-bottom: 14px; }
+  .risk-hero-level {
+    display: inline-block; font-size: 13px; font-weight: 700;
+    padding: 4px 20px; border-radius: 20px; margin-bottom: 16px;
+    border: 1.5px solid currentColor;
+  }
+  .risk-hero-sublbl {
+    font-size: 11px; color: var(--text2); margin-bottom: 16px; line-height: 1.6;
+  }
+  .risk-hero-bar-wrap {
+    height: 8px; background: var(--border); border-radius: 4px;
+    overflow: hidden; margin: 0 0 18px;
+  }
+  .risk-hero-bar-fill {
+    height: 100%; border-radius: 4px;
+    transition: width 0.8s cubic-bezier(.4,0,.2,1), background 0.3s;
+  }
 
-  .station-list { padding: 16px 20px; }
-  .station-list h2 {
-    font-size: 13px; color: var(--text2); font-weight: 500;
-    letter-spacing: 1px; margin-bottom: 12px;
-    padding-left: 4px;
+  /* Factor chips */
+  .risk-factors {
+    display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-bottom: 2px;
   }
-  .station-card {
-    display: flex; align-items: center; gap: 14px;
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 14px 16px;
-    margin-bottom: 8px;
-    cursor: pointer;
-    transition: all 0.15s;
-  }
-  .station-card:active { transform: scale(0.98); background: var(--card2); }
-  .station-card .sc-indicator {
-    width: 40px; height: 40px; border-radius: 10px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 18px; font-weight: 700; flex-shrink: 0;
-  }
-  .station-card .sc-name { font-size: 15px; font-weight: 600; color: #fff; }
-  .station-card .sc-sub { font-size: 11px; color: var(--text2); margin-top: 2px; }
-  .station-card .sc-count {
-    margin-left: auto; font-size: 11px; color: var(--text2);
-    display: flex; align-items: center; gap: 4px;
-  }
-  .station-card .sc-count .cnt { font-weight: 700; color: var(--accent); font-size: 14px; }
-
-  /* Station danger level colors */
-  .danger-high .sc-indicator { background: rgba(230,57,70,0.15); color: var(--danger); }
-  .danger-mid .sc-indicator { background: rgba(230,169,70,0.15); color: var(--accent2); }
-  .danger-low .sc-indicator { background: rgba(42,157,143,0.15); color: var(--accent); }
-
-  /* ── Station Detail Screen ── */
-  .station-header {
-    padding: 20px 20px 16px;
-    background: linear-gradient(180deg, #0f1f30 0%, var(--bg) 100%);
-  }
-  .station-back {
-    background: none; border: none; color: var(--accent);
-    font-size: 14px; cursor: pointer; padding: 4px 0; font-family: inherit;
-    display: flex; align-items: center; gap: 4px;
-  }
-  .station-header h1 { font-size: 22px; font-weight: 700; color: #fff; margin-top: 8px; }
-  .station-header .sh-sub { font-size: 12px; color: var(--text2); margin-top: 4px; }
-
-  .presence-bar {
-    margin: 0 20px; padding: 16px 20px;
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    display: flex; align-items: center; gap: 16px;
-  }
-  .presence-bar .pb-num { font-size: 32px; font-weight: 700; color: var(--accent); }
-  .presence-bar .pb-text { font-size: 12px; color: var(--text2); line-height: 1.5; }
-
-  /* Tabs */
-  .tab-row {
-    display: flex; padding: 16px 20px 0; gap: 4px;
-  }
-  .tab-btn {
-    flex: 1; padding: 10px 0; text-align: center;
-    background: none; border: none; border-bottom: 2px solid transparent;
-    color: var(--text2); font-size: 13px; font-weight: 500;
-    cursor: pointer; font-family: inherit; transition: all 0.2s;
-  }
-  .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
-  .tab-content { display: none; padding: 16px 20px; }
-  .tab-content.active { display: block; animation: fadeIn 0.2s ease; }
-
-  /* Mood Pulse */
-  .mood-section { text-align: center; padding: 20px 0; }
-  .mood-section p { font-size: 14px; color: var(--text2); margin-bottom: 16px; }
-  .mood-btns { display: flex; justify-content: center; gap: 12px; }
-  .mood-btn {
-    width: 60px; height: 60px; border-radius: 50%;
-    background: var(--card2); border: 2px solid var(--border);
-    font-size: 28px; cursor: pointer; transition: all 0.2s;
-    display: flex; align-items: center; justify-content: center;
-  }
-  .mood-btn:active { transform: scale(0.9); }
-  .mood-btn.selected { border-color: var(--accent); background: rgba(42,157,143,0.15); transform: scale(1.1); }
-  .mood-result {
-    margin-top: 20px; padding: 16px;
-    background: var(--card); border-radius: 12px; border: 1px solid var(--border);
-  }
-  .mood-bar-row { display: flex; align-items: center; gap: 8px; margin: 6px 0; }
-  .mood-bar-row .mb-emoji { font-size: 18px; width: 28px; text-align: center; }
-  .mood-bar-row .mb-bar { flex: 1; height: 20px; background: var(--bg); border-radius: 4px; overflow: hidden; }
-  .mood-bar-row .mb-fill { height: 100%; border-radius: 4px; transition: width 0.5s ease; }
-  .mood-bar-row .mb-count { font-size: 12px; color: var(--text2); width: 32px; text-align: right; }
-
-  /* Hitokoto Board */
-  .hitokoto-input-area {
+  .risk-factor-chip {
     background: var(--card); border: 1px solid var(--border);
-    border-radius: var(--radius); padding: 16px; margin-bottom: 16px;
+    border-radius: 10px; padding: 6px 12px;
+    font-size: 10px; color: var(--text2); text-align: center; min-width: 68px;
   }
-  .hitokoto-input-area textarea {
-    width: 100%; background: var(--bg); border: 1px solid var(--border);
-    border-radius: 10px; padding: 12px; color: var(--text);
-    font-family: inherit; font-size: 14px; resize: none;
-    min-height: 60px; outline: none;
+  .risk-factor-chip .rfc-val {
+    font-size: 14px; font-weight: 700; color: var(--text); display: block; margin-top: 2px;
   }
-  .hitokoto-input-area textarea:focus { border-color: var(--accent); }
-  .hitokoto-input-area textarea::placeholder { color: var(--text2); }
-  .hitokoto-meta {
-    display: flex; justify-content: space-between; align-items: center;
-    margin-top: 10px;
-  }
-  .char-count { font-size: 11px; color: var(--text2); }
-  .post-btn {
-    background: var(--accent); color: #fff; border: none;
-    border-radius: 20px; padding: 8px 24px; font-size: 13px;
-    font-weight: 600; cursor: pointer; font-family: inherit;
-    transition: all 0.15s;
-  }
-  .post-btn:disabled { opacity: 0.4; cursor: default; }
-  .post-btn:active:not(:disabled) { transform: scale(0.95); }
 
-  .hitokoto-list { display: flex; flex-direction: column; gap: 10px; }
-  .hitokoto-card {
+  /* Weather badge */
+  .weather-badge {
+    display: flex; align-items: center; gap: 8px;
+    margin: 14px 20px 0;
+    padding: 10px 14px; background: var(--card); border: 1px solid var(--border);
+    border-radius: 12px; font-size: 12px; color: var(--text2);
+  }
+  .weather-badge .wb-icon { font-size: 22px; line-height: 1; }
+  .weather-badge .wb-main { font-size: 13px; color: var(--text); font-weight: 600; }
+  .weather-badge .wb-mult { margin-left: auto; font-size: 11px; }
+  .weather-badge .wb-mult b { font-weight: 700; }
+
+  /* 7-day strip */
+  .week-strip {
+    display: flex; gap: 6px;
+    padding: 14px 20px 0;
+    overflow-x: auto; -webkit-overflow-scrolling: touch;
+  }
+  .week-strip::-webkit-scrollbar { display: none; }
+  .week-day {
+    flex: 0 0 auto; width: 46px;
     background: var(--card); border: 1px solid var(--border);
-    border-radius: 12px; padding: 14px 16px;
+    border-radius: 10px; padding: 8px 4px;
+    text-align: center; display: flex; flex-direction: column; align-items: center; gap: 4px;
   }
-  .hitokoto-card .hc-text { font-size: 14px; line-height: 1.7; color: var(--text); }
-  .hitokoto-card .hc-footer {
-    display: flex; justify-content: space-between; align-items: center;
-    margin-top: 10px; font-size: 11px; color: var(--text2);
-  }
-  .like-btn {
-    background: none; border: 1px solid var(--border); border-radius: 16px;
-    padding: 4px 12px; color: var(--text2); font-size: 12px;
-    cursor: pointer; font-family: inherit; transition: all 0.15s;
-    display: flex; align-items: center; gap: 4px;
-  }
-  .like-btn:active { transform: scale(0.95); }
-  .like-btn.liked { border-color: var(--danger); color: var(--danger); background: rgba(230,57,70,0.08); }
+  .week-day.wd-today { border-color: var(--accent); }
+  .week-day .wd-dow { font-size: 10px; color: var(--text2); }
+  .week-day .wd-date { font-size: 11px; }
+  .week-day .wd-bar { width: 30px; height: 4px; border-radius: 2px; }
+  .week-day .wd-pct { font-size: 12px; font-weight: 700; }
 
-  /* Book Shelf */
-  .book-input-area {
-    background: var(--card); border: 1px solid var(--border);
-    border-radius: var(--radius); padding: 16px; margin-bottom: 16px;
+  /* Source line */
+  .risk-src-line {
+    margin: 14px 20px 0;
+    padding: 12px 0 0;
+    border-top: 1px solid var(--border);
+    font-size: 10px; color: var(--text2); line-height: 1.9;
   }
-  .book-input-area input, .book-input-area textarea {
-    width: 100%; background: var(--bg); border: 1px solid var(--border);
-    border-radius: 10px; padding: 10px 12px; color: var(--text);
-    font-family: inherit; font-size: 14px; outline: none; margin-bottom: 8px;
-  }
-  .book-input-area input:focus, .book-input-area textarea:focus { border-color: var(--accent); }
-  .book-input-area input::placeholder, .book-input-area textarea::placeholder { color: var(--text2); }
-  .book-input-area textarea { resize: none; min-height: 50px; }
+  .risk-src-line a { color: var(--text2); text-decoration: none; }
 
-  .book-list { display: flex; flex-direction: column; gap: 10px; }
-  .book-card {
-    background: var(--card); border: 1px solid var(--border);
-    border-radius: 12px; padding: 16px;
-    display: flex; gap: 14px;
-  }
-  .book-card .bc-cover {
-    width: 48px; height: 68px; border-radius: 6px;
-    background: linear-gradient(135deg, var(--card2), var(--border));
-    display: flex; align-items: center; justify-content: center;
-    font-size: 24px; flex-shrink: 0;
-  }
-  .book-card .bc-info { flex: 1; }
-  .book-card .bc-title { font-size: 14px; font-weight: 600; color: #fff; }
-  .book-card .bc-note {
-    font-size: 12px; color: var(--text2); margin-top: 6px; line-height: 1.6;
-    font-style: italic;
-  }
-  .book-card .bc-meta {
-    font-size: 11px; color: var(--text2); margin-top: 8px;
-    display: flex; justify-content: space-between; align-items: center;
-  }
-  .book-card .bc-journey {
-    font-size: 10px; color: var(--accent); background: rgba(42,157,143,0.1);
-    padding: 2px 8px; border-radius: 8px;
-  }
-
-  /* ── About Screen ── */
-  .about-content { padding: 24px 20px; }
-  .about-content h2 { font-size: 20px; font-weight: 700; color: #fff; margin-bottom: 16px; }
-  .about-content p { font-size: 14px; color: var(--text2); line-height: 1.9; margin-bottom: 16px; }
-  .about-content strong { color: var(--text); }
-
-  /* ── Crisis Banner ── */
+  /* Crisis banner */
   .crisis-banner {
     margin: 16px 20px; padding: 16px;
     background: linear-gradient(135deg, #1a2028, #1a2530);
@@ -283,159 +171,11 @@
     font-size: 11px; color: var(--accent2); letter-spacing: 1px; font-weight: 600;
     margin-bottom: 6px;
   }
-  .crisis-banner a {
-    color: var(--accent); text-decoration: none; font-weight: 600;
-  }
-
-  /* Late night mode */
-  body.late-night {
-    --accent: #e8c170;
-    --card: #14202e;
-  }
+  .crisis-banner a { color: var(--accent); text-decoration: none; font-weight: 600; }
   body.late-night .crisis-banner {
     border-color: var(--accent2);
     background: linear-gradient(135deg, #1a2018, #20281a);
   }
-  .late-night-indicator {
-    display: none;
-    text-align: center;
-    padding: 8px;
-    font-size: 11px;
-    color: var(--warm);
-    background: rgba(232,193,112,0.06);
-    border-bottom: 1px solid rgba(232,193,112,0.1);
-  }
-  body.late-night .late-night-indicator { display: block; }
-
-  /* ── Empty states ── */
-  .empty-state {
-    text-align: center; padding: 40px 20px;
-    color: var(--text2); font-size: 13px;
-  }
-  .empty-state .es-icon { font-size: 40px; margin-bottom: 12px; opacity: 0.5; }
-
-  /* ── Search ── */
-  .search-box {
-    margin: 0 20px 12px; position: relative;
-  }
-  .search-box input {
-    width: 100%; background: var(--card); border: 1px solid var(--border);
-    border-radius: 12px; padding: 12px 16px 12px 40px;
-    color: var(--text); font-family: inherit; font-size: 14px; outline: none;
-  }
-  .search-box input:focus { border-color: var(--accent); }
-  .search-box input::placeholder { color: var(--text2); }
-  .search-box .search-icon {
-    position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
-    font-size: 16px; color: var(--text2);
-  }
-
-  /* ── Utilities ── */
-  .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); }
-
-  /* ── Risk Hero (new home) ── */
-  .risk-hero {
-    padding: 32px 20px 20px;
-    background: linear-gradient(180deg, #0a1828 0%, var(--bg) 100%);
-    text-align: center;
-    position: relative;
-  }
-  .risk-hero-date {
-    font-size: 11px; color: var(--text2); letter-spacing: 0.5px; margin-bottom: 8px;
-  }
-  .risk-hero-label {
-    font-size: 11px; color: var(--text2); letter-spacing: 1.5px; font-weight: 600;
-    text-transform: uppercase; margin-bottom: 4px;
-  }
-  .risk-hero-num-row {
-    display: flex; align-items: flex-end; justify-content: center; gap: 4px;
-    margin: 4px 0 2px;
-  }
-  .risk-hero-num {
-    font-size: 88px; font-weight: 700; line-height: 1;
-    transition: color 0.4s; letter-spacing: -2px;
-  }
-  .risk-hero-sym { font-size: 32px; font-weight: 500; color: var(--text2); padding-bottom: 12px; }
-  .risk-hero-level {
-    display: inline-block;
-    font-size: 13px; font-weight: 700;
-    padding: 3px 16px; border-radius: 20px;
-    margin-bottom: 14px;
-    border: 1.5px solid currentColor;
-  }
-  .risk-hero-sublbl {
-    font-size: 11px; color: var(--text2); margin-bottom: 14px; line-height: 1.6;
-  }
-  .risk-hero-bar-wrap {
-    height: 8px; background: var(--border); border-radius: 4px;
-    overflow: hidden; margin: 0 0 16px;
-  }
-  .risk-hero-bar-fill {
-    height: 100%; border-radius: 4px;
-    transition: width 0.7s ease, background 0.3s;
-  }
-
-  /* Factor chips row */
-  .risk-factors {
-    display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;
-    margin-bottom: 4px;
-  }
-  .risk-factor-chip {
-    background: var(--card); border: 1px solid var(--border);
-    border-radius: 10px; padding: 6px 12px;
-    font-size: 11px; color: var(--text2); text-align: center; min-width: 72px;
-  }
-  .risk-factor-chip .rfc-val { font-size: 15px; font-weight: 700; color: var(--text); display: block; margin-top: 2px; }
-
-  /* Weather badge (compact) */
-  .weather-badge {
-    display: flex; align-items: center; gap: 8px;
-    margin: 12px 20px 0;
-    padding: 8px 14px; background: var(--card); border: 1px solid var(--border);
-    border-radius: 12px; font-size: 12px; color: var(--text2);
-  }
-  .weather-badge .wb-icon { font-size: 22px; line-height: 1; }
-  .weather-badge .wb-main { font-size: 13px; color: var(--text); font-weight: 600; }
-  .weather-badge .wb-mult { margin-left: auto; font-size: 11px; }
-  .weather-badge .wb-mult b { font-weight: 700; }
-
-  /* 7-day mini forecast strip */
-  .week-strip {
-    display: flex; gap: 6px;
-    padding: 14px 20px 0;
-    overflow-x: auto; -webkit-overflow-scrolling: touch;
-  }
-  .week-strip::-webkit-scrollbar { display: none; }
-  .week-day {
-    flex: 0 0 auto; width: 44px;
-    background: var(--card); border: 1px solid var(--border);
-    border-radius: 10px; padding: 8px 4px;
-    text-align: center; display: flex; flex-direction: column; align-items: center; gap: 4px;
-  }
-  .week-day.wd-today { border-color: var(--accent); }
-  .week-day .wd-dow { font-size: 10px; color: var(--text2); }
-  .week-day .wd-date { font-size: 11px; color: var(--text2); }
-  .week-day .wd-pct { font-size: 13px; font-weight: 700; }
-  .week-day .wd-bar { width: 28px; height: 4px; border-radius: 2px; }
-
-  /* Source line */
-  .risk-src-line {
-    margin: 12px 20px 0;
-    padding: 10px 0 0;
-    border-top: 1px solid var(--border);
-    font-size: 10px; color: var(--text2); line-height: 1.8;
-  }
-  .risk-src-line a { color: var(--text2); text-decoration: none; }
-
-  /* ── Legacy risk-card (kept for compat) ── */
-  .risk-card { display: none; }
-  .risk-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 2px; }
-  .risk-tag {
-    background: var(--card2); border: 1px solid var(--border);
-    border-radius: 6px; padding: 4px 9px;
-    font-size: 11px; color: var(--text2);
-  }
-  .risk-tag b { color: var(--text); font-weight: 600; }
 
   /* ── Forecast Screen ── */
   .forecast-header {
@@ -451,59 +191,46 @@
     font-weight: 600; margin-bottom: 12px;
   }
 
-  /* Heatmap calendar */
+  /* Heatmap */
   .fc-heatmap { display: flex; flex-direction: column; gap: 6px; }
-  .fc-month-row { display: flex; align-items: center; gap: 6px; }
-  .fc-month-lbl { font-size: 11px; color: var(--text2); width: 24px; text-align: right; flex-shrink: 0; }
-  .fc-cells { display: flex; gap: 2px; flex: 1; }
-  .fc-cell {
-    flex: 1; max-width: 14px; height: 22px; border-radius: 2px;
-    position: relative; cursor: default;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 7px; color: rgba(255,255,255,0.85); line-height: 1;
-    font-weight: 500;
+  .fc-legend {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 10px; color: var(--text2); margin-top: 8px; flex-wrap: wrap;
   }
-  .fc-cell.fc-today { outline: 2px solid #fff; outline-offset: 1px; z-index: 1; }
-  .fc-cell.fc-past { opacity: 0.4; }
-  .fc-cell.fc-empty { background: transparent !important; }
+  .fc-legend-cell { width: 12px; height: 12px; border-radius: 2px; display: inline-block; }
 
-  /* DOW header */
-  .fc-dow-header { display: flex; gap: 2px; margin-bottom: 4px; padding-left: 30px; }
-  .fc-dow-hdr-cell {
-    flex: 1; max-width: 14px; text-align: center;
-    font-size: 8px; color: var(--text2);
-  }
-
-  /* Monthly bar chart */
-  .fc-bar-row {
-    display: flex; align-items: center; gap: 8px; margin-bottom: 7px;
-  }
+  /* Monthly bar */
+  .fc-bar-row { display: flex; align-items: center; gap: 8px; margin-bottom: 7px; }
   .fc-bar-lbl { font-size: 11px; color: var(--text2); width: 26px; text-align: right; flex-shrink: 0; }
-  .fc-bar-track {
-    flex: 1; height: 18px; background: var(--border);
-    border-radius: 3px; overflow: hidden;
-  }
+  .fc-bar-track { flex: 1; height: 18px; background: var(--border); border-radius: 3px; overflow: hidden; }
   .fc-bar-fill { height: 100%; border-radius: 3px; transition: width 0.7s ease; }
   .fc-bar-val { font-size: 11px; color: var(--text2); width: 38px; flex-shrink: 0; }
-  .fc-bar-row.fc-cur .fc-bar-lbl,
-  .fc-bar-row.fc-cur .fc-bar-val { color: var(--accent); font-weight: 700; }
 
-  /* DOW vertical bar chart */
+  /* DOW chart */
   .fc-dow-chart { display: flex; gap: 6px; height: 90px; align-items: stretch; }
   .fc-dow-col { flex: 1; display: flex; flex-direction: column; align-items: center; }
   .fc-dow-bars { flex: 1; width: 100%; display: flex; align-items: flex-end; }
   .fc-dow-bar { width: 100%; border-radius: 3px 3px 0 0; min-height: 3px; transition: height 0.6s ease; }
   .fc-dow-num { font-size: 9px; color: var(--text2); margin: 3px 0 2px; }
   .fc-dow-name { font-size: 11px; color: var(--text2); }
-  .fc-dow-col.fc-dow-cur .fc-dow-name { color: var(--accent); font-weight: 700; }
 
-  /* Legend */
-  .fc-legend {
-    display: flex; align-items: center; gap: 6px;
-    font-size: 10px; color: var(--text2); margin-top: 8px;
-    flex-wrap: wrap;
+  /* ── About Screen ── */
+  .about-content { padding: 40px 20px 24px; }
+  .about-content h2 { font-size: 20px; font-weight: 700; color: #fff; margin-bottom: 16px; }
+  .about-content h3 { font-size: 14px; font-weight: 700; color: var(--text); margin: 24px 0 10px; }
+  .about-content p { font-size: 14px; color: var(--text2); line-height: 1.9; margin-bottom: 12px; }
+  .about-content strong { color: var(--text); }
+  .about-content a { color: var(--accent); text-decoration: none; }
+
+  .stat-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 16px 0;
   }
-  .fc-legend-cell { width: 12px; height: 12px; border-radius: 2px; display: inline-block; }
+  .stat-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 12px; padding: 14px 16px; text-align: center;
+  }
+  .stat-card .sc-num { font-size: 28px; font-weight: 700; color: var(--accent); }
+  .stat-card .sc-lbl { font-size: 11px; color: var(--text2); margin-top: 4px; line-height: 1.4; }
 </style>
 </head>
 <body>
@@ -515,10 +242,9 @@
 <!-- ============================================ -->
 <div class="screen active" id="screen-home">
 
-  <!-- ═══ RISK HERO ═══ -->
   <div class="risk-hero">
     <div class="risk-hero-date" id="riskHeroDate"></div>
-    <div class="risk-hero-label">TODAY&#39;S DELAY RISK ／ 今日の大規模遅延リスク</div>
+    <div class="risk-hero-label">TODAY&#39;S DELAY RISK ／ 大規模遅延リスク</div>
     <div class="risk-hero-num-row">
       <div class="risk-hero-num" id="riskHeroNum">--</div>
       <div class="risk-hero-sym">%</div>
@@ -531,151 +257,23 @@
     <div class="risk-factors" id="riskFactors"></div>
   </div>
 
-  <!-- Weather badge -->
   <div class="weather-badge" id="weatherBadge">
     <span class="wb-icon">&#x23F3;</span>
     <span>天気を取得中…</span>
   </div>
 
-  <!-- 7-day mini forecast strip -->
   <div class="week-strip" id="weekStrip"></div>
 
-  <!-- Source line -->
   <div class="risk-src-line">
     人身事故（436件/16年）＋信号故障・車両故障等を含む推計<br>
     出典: <a href="https://jinshinjiko.com/routes/39" target="_blank">鉄道人身事故データベース</a>
     ／<a href="https://www.tobu.co.jp/corporation/safetyreport/" target="_blank">東武安全報告書</a>
   </div>
 
-  <!-- Station Search & List -->
-  <div class="search-box" style="margin-top:16px">
-    <span class="search-icon">&#x1F50D;</span>
-    <input type="text" id="stationSearch" placeholder="駅名で検索...">
-  </div>
-
-  <div class="station-list">
-    <h2>&#x1F689; 沿線の駅</h2>
-    <div id="stationListContainer"></div>
-  </div>
-
   <div class="crisis-banner">
     <div class="cb-title">つらいときは、ここに</div>
     いのちの電話 <a href="tel:0570783556">0570-783-556</a><br>
     よりそいホットライン <a href="tel:0120279338">0120-279-338</a> (24h)
-  </div>
-</div>
-
-<!-- ============================================ -->
-<!-- SCREEN: STATION DETAIL                       -->
-<!-- ============================================ -->
-<div class="screen" id="screen-station">
-  <div class="station-header">
-    <button class="station-back" onclick="showScreen('home')">&#x2190; 沿線一覧に戻る</button>
-    <h1 id="stationTitle">--</h1>
-    <div class="sh-sub" id="stationSubtitle">--</div>
-  </div>
-
-  <div class="presence-bar">
-    <div class="pb-num" id="stationPresence">--</div>
-    <div class="pb-text">
-      <span class="pulse-dot"></span>
-      いまこの駅ページを<br>見ている人
-    </div>
-  </div>
-
-  <div class="tab-row">
-    <button class="tab-btn active" onclick="switchTab('mood')">&#x1F321; 空気</button>
-    <button class="tab-btn" onclick="switchTab('hitokoto')">&#x1F4AC; ひとこと</button>
-    <button class="tab-btn" onclick="switchTab('book')">&#x1F4D6; 一冊棚</button>
-  </div>
-
-  <!-- Tab: Mood -->
-  <div class="tab-content active" id="tab-mood">
-    <div class="mood-section">
-      <p>いまの気分は？（匿名・1日1回）</p>
-      <div class="mood-btns" id="moodBtns">
-        <button class="mood-btn" data-mood="great" aria-label="すごくいい">&#x1F60A;</button>
-        <button class="mood-btn" data-mood="ok" aria-label="まあまあ">&#x1F642;</button>
-        <button class="mood-btn" data-mood="meh" aria-label="微妙">&#x1F614;</button>
-        <button class="mood-btn" data-mood="bad" aria-label="つらい">&#x1F622;</button>
-      </div>
-      <div class="mood-result" id="moodResult"></div>
-    </div>
-    <div class="crisis-banner">
-      <div class="cb-title">ひとりで抱えないで</div>
-      よりそいホットライン <a href="tel:0120279338">0120-279-338</a> (24h)<br>
-      <span style="font-size:11px">チャット相談: <a href="https://yorisoi-chat.jp/" target="_blank">yorisoi-chat.jp</a></span>
-    </div>
-  </div>
-
-  <!-- Tab: Hitokoto -->
-  <div class="tab-content" id="tab-hitokoto">
-    <div class="hitokoto-input-area">
-      <textarea id="hitokotoInput" maxlength="140" placeholder="この駅で思ったこと、ひとことどうぞ。（匿名・140字）"></textarea>
-      <div class="hitokoto-meta">
-        <span class="char-count"><span id="charCount">0</span>/140</span>
-        <button class="post-btn" id="postBtn" disabled onclick="postHitokoto()">投稿する</button>
-      </div>
-    </div>
-    <div class="hitokoto-list" id="hitokotoList"></div>
-  </div>
-
-  <!-- Tab: Book -->
-  <div class="tab-content" id="tab-book">
-    <div class="book-input-area">
-      <input type="text" id="bookTitle" placeholder="&#x1F4D6; 本のタイトル" maxlength="60">
-      <textarea id="bookNote" placeholder="&#x270D; この本についてひとこと（この本に救われました、p.42が好き、など）" maxlength="200"></textarea>
-      <div style="text-align:right;margin-top:4px">
-        <button class="post-btn" id="bookPostBtn" disabled onclick="postBook()">棚に置く</button>
-      </div>
-    </div>
-    <div class="book-list" id="bookList"></div>
-  </div>
-</div>
-
-<!-- ============================================ -->
-<!-- SCREEN: ABOUT                                -->
-<!-- ============================================ -->
-<div class="screen" id="screen-about">
-  <div class="about-content">
-    <h2>東上空気について</h2>
-    <p>
-      東武東上線で、毎朝同じ電車に乗っている<strong>「見知った他人」</strong>。
-      顔は知っているけど、話したことはない。でも確かに、同じ空気を吸っている。
-    </p>
-    <p>
-      このサイトは、その<strong>「同じ空気」を可視化する</strong>だけの場所です。
-      登録不要。名前もプロフィールもいりません。
-    </p>
-    <p>
-      駅ごとの「ひとこと掲示板」に匿名のつぶやきを残したり、
-      おすすめの本を「一冊棚」に置いたり。
-      <strong>話さなくてもいい。読むだけでもいい。ここにいるだけでいい。</strong>
-    </p>
-
-    <h2 style="margin-top:32px">3つの約束</h2>
-    <p>
-      <strong>1. 匿名です。</strong>名前もメールアドレスも聞きません。<br>
-      <strong>2. 義務はゼロです。</strong>投稿しなくてもいい。見るだけでもいい。いつでもやめられます。<br>
-      <strong>3. つらい時の出口があります。</strong>各ページに相談窓口を表示しています。
-    </p>
-
-    <div class="crisis-banner" style="margin:24px 0">
-      <div class="cb-title">相談窓口</div>
-      いのちの電話 <a href="tel:0570783556">0570-783-556</a><br>
-      よりそいホットライン <a href="tel:0120279338">0120-279-338</a> (24h)<br>
-      チャット相談 <a href="https://yorisoi-chat.jp/" target="_blank">yorisoi-chat.jp</a>
-    </div>
-
-    <h2 style="margin-top:32px">このプロジェクトについて</h2>
-    <p>
-      東武東上線の人身事故データを社会学的に分析した結果、
-      「地域紐帯の希薄化」が構造的要因の一つであることが示唆されました。
-      本サイトはその知見に基づき、<strong>ゼロコストで実現可能な最小限の介入</strong>として設計されています。
-    </p>
-    <p style="font-size:12px;color:var(--text2)">
-      開発: 東上空気プロジェクト | データ出典: 鉄道人身事故データベース (jinshinjiko.com)
-    </p>
   </div>
 </div>
 
@@ -688,20 +286,17 @@
     <div class="fh-sub">月別・曜日別の大規模遅延リスク予測（統計ベース）</div>
   </div>
 
-  <!-- Heatmap -->
   <div class="fc-section">
     <div class="fc-section-title">&#x1F5FA; 日別ヒートマップ</div>
     <div id="fcHeatmap"></div>
     <div class="fc-legend" id="fcLegend"></div>
   </div>
 
-  <!-- Monthly bar -->
   <div class="fc-section">
     <div class="fc-section-title">&#x1F4CA; 月別 平均リスク</div>
     <div id="fcMonthBars"></div>
   </div>
 
-  <!-- DOW chart -->
   <div class="fc-section">
     <div class="fc-section-title">&#x1F4C6; 曜日別 リスク傾向</div>
     <div class="fc-dow-chart" id="fcDowChart"></div>
@@ -715,17 +310,85 @@
 </div>
 
 <!-- ============================================ -->
+<!-- SCREEN: ABOUT                                -->
+<!-- ============================================ -->
+<div class="screen" id="screen-about">
+  <div class="about-content">
+    <h2>東上空気について</h2>
+    <p>
+      東武東上線の<strong>大規模遅延リスクを統計的に可視化する</strong>ツールです。
+      「今日、電車が大幅に遅れる可能性はどのくらいか」を毎日計算して表示します。
+    </p>
+
+    <div class="stat-grid">
+      <div class="stat-card">
+        <div class="sc-num">436件</div>
+        <div class="sc-lbl">人身事故数<br>（2010〜2026年）</div>
+      </div>
+      <div class="stat-card">
+        <div class="sc-num">×1.5</div>
+        <div class="sc-lbl">信号・車両故障等<br>を含む補正係数</div>
+      </div>
+      <div class="stat-card">
+        <div class="sc-num">16年</div>
+        <div class="sc-lbl">分析期間</div>
+      </div>
+      <div class="stat-card">
+        <div class="sc-num">4要素</div>
+        <div class="sc-lbl">月・曜日・天気・<br>基本レートを合成</div>
+      </div>
+    </div>
+
+    <h3>リスク計算のしくみ</h3>
+    <p>
+      基本レート（全期間の事故頻度）に、<strong>月傾向・曜日傾向・天候補正</strong>を掛け合わせて算出します。
+      天気データは <a href="https://open-meteo.com" target="_blank">Open-Meteo</a> からリアルタイム取得しています（APIキー不要・無料）。
+    </p>
+    <p>
+      リスク値が高くても遅延が起きないこともありますし、低くても起きることがあります。
+      あくまで<strong>統計的な傾向に基づく参考情報</strong>として活用ください。
+    </p>
+
+    <h3>判定基準</h3>
+    <p>
+      <strong style="color:#2a9d8f">〜8%：低め</strong> ／
+      <strong style="color:#e6a946">8〜12%：平均的</strong> ／
+      <strong style="color:#f4845f">12〜18%：やや高め</strong> ／
+      <strong style="color:#e63946">18%〜：高め</strong>
+    </p>
+
+    <h3>データ出典</h3>
+    <p>
+      <a href="https://jinshinjiko.com/routes/39" target="_blank">鉄道人身事故データベース</a>（jinshinjiko.com）<br>
+      <a href="https://www.tobu.co.jp/corporation/safetyreport/" target="_blank">東武鉄道 安全報告書</a><br>
+      <a href="https://open-meteo.com" target="_blank">Open-Meteo 気象API</a>
+    </p>
+
+    <div class="crisis-banner" style="margin:24px 0">
+      <div class="cb-title">相談窓口</div>
+      いのちの電話 <a href="tel:0570783556">0570-783-556</a><br>
+      よりそいホットライン <a href="tel:0120279338">0120-279-338</a> (24h)<br>
+      チャット相談 <a href="https://yorisoi-chat.jp/" target="_blank">yorisoi-chat.jp</a>
+    </div>
+
+    <p style="font-size:11px;color:var(--text2)">
+      東上空気プロジェクト | 東武東上線 遅延リスク可視化ツール
+    </p>
+  </div>
+</div>
+
+<!-- ============================================ -->
 <!-- BOTTOM NAV                                   -->
 <!-- ============================================ -->
 <div class="bottom-nav">
   <button class="nav-item active" onclick="showScreen('home')" id="nav-home">
-    <span class="nav-icon">&#x1F689;</span>沿線
+    <span class="nav-icon">&#x1F68B;</span>今日
   </button>
   <button class="nav-item" onclick="showScreen('forecast')" id="nav-forecast">
     <span class="nav-icon">&#x1F4C5;</span>予測
   </button>
   <button class="nav-item" onclick="showScreen('about')" id="nav-about">
-    <span class="nav-icon">&#x1F4A1;</span>東上空気とは
+    <span class="nav-icon">&#x1F4CA;</span>このサービスとは
   </button>
 </div>
 
@@ -733,354 +396,14 @@
 <!-- JAVASCRIPT                                   -->
 <!-- ============================================ -->
 <script>
-// ── Station Data ──
-const STATIONS = [
-  {id:"ikebukuro",name:"池袋",area:"豊島区"},
-  {id:"kitaikebukuro",name:"北池袋",area:"豊島区"},
-  {id:"shimotakaido",name:"下板橋",area:"豊島区",danger:2},
-  {id:"oyama",name:"大山",area:"板橋区"},
-  {id:"nakaitabashi",name:"中板橋",area:"板橋区",danger:1},
-  {id:"tokiwadai",name:"ときわ台",area:"板橋区",danger:1},
-  {id:"kamiitabashi",name:"上板橋",area:"板橋区",danger:1},
-  {id:"tobnerima",name:"東武練馬",area:"練馬区",danger:2},
-  {id:"shimoakatsuka",name:"下赤塚",area:"板橋区",danger:1},
-  {id:"narimasu",name:"成増",area:"板橋区"},
-  {id:"wakoshi",name:"和光市",area:"和光市"},
-  {id:"asaka",name:"朝霞",area:"朝霞市"},
-  {id:"asakadai",name:"朝霞台",area:"朝霞市",danger:1},
-  {id:"shiki",name:"志木",area:"新座市"},
-  {id:"yanasegawa",name:"柳瀬川",area:"志木市",danger:3},
-  {id:"mizuhodai",name:"みずほ台",area:"富士見市",danger:1},
-  {id:"tsuruse",name:"鶴瀬",area:"富士見市",danger:2},
-  {id:"fujimino",name:"ふじみ野",area:"ふじみ野市",danger:3},
-  {id:"kamifukuoka",name:"上福岡",area:"ふじみ野市",danger:1},
-  {id:"shingashi",name:"新河岸",area:"川越市",danger:1},
-  {id:"kawagoe",name:"川越",area:"川越市"},
-  {id:"kawagoeshi",name:"川越市",area:"川越市"},
-  {id:"kasumigaseki",name:"霞ヶ関",area:"川越市",danger:1},
-  {id:"tsurugashima",name:"鶴ヶ島",area:"鶴ヶ島市",danger:1},
-  {id:"wakaba",name:"若葉",area:"鶴ヶ島市"},
-  {id:"sakado",name:"坂戸",area:"坂戸市"},
-  {id:"kitasakado",name:"北坂戸",area:"坂戸市",danger:1},
-  {id:"takasaka",name:"高坂",area:"東松山市"},
-  {id:"higashimatsuyama",name:"東松山",area:"東松山市",danger:1},
-  {id:"shinrinkoen",name:"森林公園",area:"滑川町",danger:1},
-];
-
-// ── State ──
-let currentStation = null;
-let currentTab = 'mood';
-
-// ── Local Storage helpers ──
-function getStore(key, def) {
-  try { return JSON.parse(localStorage.getItem('tojo_' + key)) || def; }
-  catch { return def; }
-}
-function setStore(key, val) {
-  localStorage.setItem('tojo_' + key, JSON.stringify(val));
-}
 
 // ── Screen Navigation ──
 function showScreen(name) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-
-  if (name === 'home') {
-    document.getElementById('screen-home').classList.add('active');
-    document.getElementById('nav-home').classList.add('active');
-  } else if (name === 'station') {
-    document.getElementById('screen-station').classList.add('active');
-  } else if (name === 'forecast') {
-    document.getElementById('screen-forecast').classList.add('active');
-    document.getElementById('nav-forecast').classList.add('active');
-    renderForecast();
-  } else if (name === 'about') {
-    document.getElementById('screen-about').classList.add('active');
-    document.getElementById('nav-about').classList.add('active');
-  }
-}
-
-// ── Station List ──
-function renderStationList(filter = '') {
-  const container = document.getElementById('stationListContainer');
-  const filtered = STATIONS.filter(s =>
-    s.name.includes(filter) || s.area.includes(filter) || s.id.includes(filter.toLowerCase())
-  );
-
-  container.innerHTML = filtered.map(s => {
-    const msgs = getStore('hitokoto_' + s.id, []).length;
-    const books = getStore('books_' + s.id, []).length;
-    const total = msgs + books;
-    const dangerClass = s.danger >= 3 ? 'danger-high' : s.danger >= 2 ? 'danger-mid' : s.danger ? 'danger-low' : '';
-
-    return `<div class="station-card ${dangerClass}" onclick="openStation('${s.id}')">
-      <div class="sc-indicator">${s.name[0]}</div>
-      <div>
-        <div class="sc-name">${s.name}</div>
-        <div class="sc-sub">${s.area}</div>
-      </div>
-      <div class="sc-count">
-        ${total > 0 ? `<span class="cnt">${total}</span> 投稿` : '<span style="color:var(--text2)">--</span>'}
-      </div>
-    </div>`;
-  }).join('');
-}
-
-// ── Open Station ──
-function openStation(stationId) {
-  const station = STATIONS.find(s => s.id === stationId);
-  if (!station) return;
-  currentStation = station;
-
-  document.getElementById('stationTitle').textContent = station.name + '駅';
-  document.getElementById('stationSubtitle').textContent = station.area + ' ── 東武東上線';
-
-  // Simulated presence (in production: WebSocket/SSE)
-  const basePresence = Math.floor(Math.random() * 8) + 1;
-  document.getElementById('stationPresence').textContent = basePresence;
-
-  // Reset tabs
-  switchTab('mood');
-
-  // Render content
-  renderMood();
-  renderHitokoto();
-  renderBooks();
-
-  showScreen('station');
-}
-
-// ── Tabs ──
-function switchTab(tabName) {
-  currentTab = tabName;
-  document.querySelectorAll('.tab-btn').forEach((btn, i) => {
-    btn.classList.toggle('active', ['mood','hitokoto','book'][i] === tabName);
-  });
-  document.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
-  document.getElementById('tab-' + tabName).classList.add('active');
-}
-
-// ── Mood ──
-function renderMood() {
-  if (!currentStation) return;
-  const moods = getStore('mood_' + currentStation.id, { great: 0, ok: 0, meh: 0, bad: 0 });
-  const todayVoted = getStore('mood_voted_' + currentStation.id, null);
-  const today = new Date().toDateString();
-
-  // Reset buttons
-  document.querySelectorAll('.mood-btn').forEach(btn => {
-    btn.classList.remove('selected');
-    if (todayVoted === today) {
-      btn.style.opacity = '0.5';
-      btn.disabled = true;
-    } else {
-      btn.style.opacity = '1';
-      btn.disabled = false;
-    }
-  });
-
-  if (todayVoted === today) {
-    const voted = getStore('mood_my_' + currentStation.id, '');
-    const btn = document.querySelector(`.mood-btn[data-mood="${voted}"]`);
-    if (btn) { btn.classList.add('selected'); btn.style.opacity = '1'; }
-  }
-
-  // Render results
-  const total = Object.values(moods).reduce((a, b) => a + b, 0) || 1;
-  const emojis = { great: '&#x1F60A;', ok: '&#x1F642;', meh: '&#x1F614;', bad: '&#x1F622;' };
-  const colors = { great: '#2a9d8f', ok: '#4a9aaa', meh: '#e6a946', bad: '#e63946' };
-
-  document.getElementById('moodResult').innerHTML =
-    `<div style="font-size:12px;color:var(--text2);margin-bottom:10px">みんなの今日の空気 (${Object.values(moods).reduce((a,b)=>a+b,0)}人が回答)</div>` +
-    Object.entries(moods).map(([key, count]) => {
-      const pct = Math.round((count / total) * 100);
-      return `<div class="mood-bar-row">
-        <div class="mb-emoji">${emojis[key]}</div>
-        <div class="mb-bar"><div class="mb-fill" style="width:${pct}%;background:${colors[key]}"></div></div>
-        <div class="mb-count">${count}</div>
-      </div>`;
-    }).join('');
-}
-
-// Mood vote handler
-document.getElementById('moodBtns').addEventListener('click', e => {
-  const btn = e.target.closest('.mood-btn');
-  if (!btn || btn.disabled) return;
-
-  const mood = btn.dataset.mood;
-  const moods = getStore('mood_' + currentStation.id, { great: 0, ok: 0, meh: 0, bad: 0 });
-  moods[mood]++;
-  setStore('mood_' + currentStation.id, moods);
-  setStore('mood_voted_' + currentStation.id, new Date().toDateString());
-  setStore('mood_my_' + currentStation.id, mood);
-  renderMood();
-});
-
-// ── Hitokoto ──
-const hitokotoInput = document.getElementById('hitokotoInput');
-const charCount = document.getElementById('charCount');
-const postBtn = document.getElementById('postBtn');
-
-hitokotoInput.addEventListener('input', () => {
-  const len = hitokotoInput.value.length;
-  charCount.textContent = len;
-  postBtn.disabled = len === 0 || len > 140;
-});
-
-function postHitokoto() {
-  if (!currentStation || !hitokotoInput.value.trim()) return;
-  const posts = getStore('hitokoto_' + currentStation.id, []);
-  posts.unshift({
-    text: hitokotoInput.value.trim(),
-    time: Date.now(),
-    likes: 0,
-    id: 'h' + Date.now()
-  });
-  // Keep max 100 posts
-  if (posts.length > 100) posts.length = 100;
-  setStore('hitokoto_' + currentStation.id, posts);
-  hitokotoInput.value = '';
-  charCount.textContent = '0';
-  postBtn.disabled = true;
-  renderHitokoto();
-  renderStationList();
-}
-
-function renderHitokoto() {
-  if (!currentStation) return;
-  const posts = getStore('hitokoto_' + currentStation.id, []);
-  const container = document.getElementById('hitokotoList');
-
-  if (posts.length === 0) {
-    container.innerHTML = `<div class="empty-state">
-      <div class="es-icon">&#x1F4AC;</div>
-      まだ投稿がありません。<br>最初のひとことを残してみませんか？
-    </div>`;
-    return;
-  }
-
-  const liked = getStore('liked_' + currentStation.id, []);
-  container.innerHTML = posts.map(post => {
-    const isLiked = liked.includes(post.id);
-    const timeAgo = getTimeAgo(post.time);
-    return `<div class="hitokoto-card">
-      <div class="hc-text">${escapeHtml(post.text)}</div>
-      <div class="hc-footer">
-        <span>${timeAgo}</span>
-        <button class="like-btn ${isLiked ? 'liked' : ''}" onclick="toggleLike('${post.id}')">
-          ${isLiked ? '&#x2764;' : '&#x1F90D;'} ${post.likes}
-        </button>
-      </div>
-    </div>`;
-  }).join('');
-}
-
-function toggleLike(postId) {
-  if (!currentStation) return;
-  const posts = getStore('hitokoto_' + currentStation.id, []);
-  const liked = getStore('liked_' + currentStation.id, []);
-  const post = posts.find(p => p.id === postId);
-  if (!post) return;
-
-  const idx = liked.indexOf(postId);
-  if (idx >= 0) {
-    liked.splice(idx, 1);
-    post.likes = Math.max(0, post.likes - 1);
-  } else {
-    liked.push(postId);
-    post.likes++;
-  }
-  setStore('hitokoto_' + currentStation.id, posts);
-  setStore('liked_' + currentStation.id, liked);
-  renderHitokoto();
-}
-
-// ── Books ──
-const bookTitleInput = document.getElementById('bookTitle');
-const bookNoteInput = document.getElementById('bookNote');
-const bookPostBtn = document.getElementById('bookPostBtn');
-
-function checkBookInput() {
-  bookPostBtn.disabled = !bookTitleInput.value.trim();
-}
-bookTitleInput.addEventListener('input', checkBookInput);
-bookNoteInput.addEventListener('input', checkBookInput);
-
-function postBook() {
-  if (!currentStation || !bookTitleInput.value.trim()) return;
-  const books = getStore('books_' + currentStation.id, []);
-  const allStationBooks = getStore('book_journey_' + bookTitleInput.value.trim(), []);
-
-  allStationBooks.push(currentStation.name);
-  setStore('book_journey_' + bookTitleInput.value.trim(), allStationBooks);
-
-  books.unshift({
-    title: bookTitleInput.value.trim(),
-    note: bookNoteInput.value.trim(),
-    time: Date.now(),
-    station: currentStation.name,
-    journey: [...allStationBooks]
-  });
-  if (books.length > 50) books.length = 50;
-  setStore('books_' + currentStation.id, books);
-
-  bookTitleInput.value = '';
-  bookNoteInput.value = '';
-  bookPostBtn.disabled = true;
-  renderBooks();
-  renderStationList();
-}
-
-function renderBooks() {
-  if (!currentStation) return;
-  const books = getStore('books_' + currentStation.id, []);
-  const container = document.getElementById('bookList');
-
-  if (books.length === 0) {
-    container.innerHTML = `<div class="empty-state">
-      <div class="es-icon">&#x1F4D6;</div>
-      まだ本がありません。<br>おすすめの一冊を棚に置いてみませんか？
-    </div>`;
-    return;
-  }
-
-  const icons = ['&#x1F4D5;','&#x1F4D7;','&#x1F4D8;','&#x1F4D9;','&#x1F4D3;'];
-  container.innerHTML = books.map((book, i) => {
-    const timeAgo = getTimeAgo(book.time);
-    const journey = book.journey && book.journey.length > 1
-      ? book.journey.join(' &#x2192; ')
-      : '';
-    return `<div class="book-card">
-      <div class="bc-cover">${icons[i % icons.length]}</div>
-      <div class="bc-info">
-        <div class="bc-title">${escapeHtml(book.title)}</div>
-        ${book.note ? `<div class="bc-note">"${escapeHtml(book.note)}"</div>` : ''}
-        <div class="bc-meta">
-          <span>${timeAgo}</span>
-          ${journey ? `<span class="bc-journey">&#x1F4CD; ${journey}</span>` : ''}
-        </div>
-      </div>
-    </div>`;
-  }).join('');
-}
-
-// ── Utilities ──
-function escapeHtml(str) {
-  const d = document.createElement('div');
-  d.textContent = str;
-  return d.innerHTML;
-}
-
-function getTimeAgo(timestamp) {
-  const diff = Date.now() - timestamp;
-  const mins = Math.floor(diff / 60000);
-  if (mins < 1) return 'たった今';
-  if (mins < 60) return mins + '分前';
-  const hours = Math.floor(mins / 60);
-  if (hours < 24) return hours + '時間前';
-  const days = Math.floor(hours / 24);
-  if (days < 7) return days + '日前';
-  return new Date(timestamp).toLocaleDateString('ja-JP');
+  document.getElementById('screen-' + name).classList.add('active');
+  document.getElementById('nav-' + name).classList.add('active');
+  if (name === 'forecast') renderForecast();
 }
 
 // ── Late Night Mode ──
@@ -1089,93 +412,7 @@ function checkLateNight() {
   document.body.classList.toggle('late-night', h >= 20 || h < 1);
 }
 
-// ── Simulated Global Count ──
-function updateGlobalCount() {
-  // In production: WebSocket connection count
-  // For demo: simulate based on time of day
-  const h = new Date().getHours();
-  const base = h >= 7 && h <= 9 ? 45 : h >= 17 && h <= 22 ? 38 : h >= 23 || h < 5 ? 8 : 15;
-  const jitter = Math.floor(Math.random() * 12) - 6;
-  document.getElementById('globalCount').textContent = Math.max(1, base + jitter);
-}
-
-// ── Search ──
-document.getElementById('stationSearch').addEventListener('input', e => {
-  renderStationList(e.target.value);
-});
-
-// ── Seed Demo Data ──
-function seedDemoData() {
-  if (getStore('seeded', false)) return;
-
-  const demoStations = ['fujimino', 'yanasegawa', 'tsuruse', 'tobnerima', 'shimotakaido',
-    'nakaitabashi', 'tokiwadai', 'shingashi', 'mizuhodai', 'kamiitabashi'];
-
-  const demoMessages = [
-    "今朝の急ブレーキ怖かった…みなさん無事でしたか",
-    "毎朝同じ車両の、いつもコーヒー飲んでる人。今日もお疲れ様です",
-    "この駅の夕焼け、実はけっこう綺麗なんですよね",
-    "今日も一日おつかれさまでした",
-    "改札前のパン屋さん、新作がめちゃくちゃ美味しかった",
-    "雨の日のホーム、みんな同じ顔してるの少し安心する",
-    "帰りたくないなぁ、って思う日もあっていいよね",
-    "最終電車のホーム、静かで好き",
-    "同じ電車の人たちに、勝手に名前つけてる自分がいる",
-    "ここのホームから見える空が好きです",
-    "毎朝ありがとう、東上線。文句も言うけど",
-    "深夜のこの駅、意外と人がいて少し安心した",
-    "今日はいい日だった。みんなにもいい日であれ",
-  ];
-
-  const demoBooks = [
-    {title:"夜と霧", note:"極限状態でも人は意味を見出せる。通勤がつらい日に読み返します"},
-    {title:"コンビニ人間", note:"「普通」って何だろうって考えさせられた"},
-    {title:"モモ", note:"時間に追われてる人に。子供の頃に戻れる"},
-    {title:"ぼくはイエローでホワイトで、ちょっとブルー", note:"自分と違う人を理解するってこういうこと"},
-    {title:"嫌われる勇気", note:"p.117の一節に救われました"},
-    {title:"星の王子さま", note:"大切なものは目に見えない。疲れた夜に"},
-  ];
-
-  demoStations.forEach((stId, idx) => {
-    // Messages
-    const msgs = [];
-    const msgCount = 2 + Math.floor(Math.random() * 4);
-    for (let i = 0; i < msgCount; i++) {
-      const msgIdx = (idx * 3 + i) % demoMessages.length;
-      msgs.push({
-        text: demoMessages[msgIdx],
-        time: Date.now() - Math.floor(Math.random() * 86400000 * 3),
-        likes: Math.floor(Math.random() * 8),
-        id: 'h' + Date.now() + i + idx
-      });
-    }
-    setStore('hitokoto_' + stId, msgs);
-
-    // Books
-    if (idx < 6) {
-      const book = demoBooks[idx];
-      setStore('books_' + stId, [{
-        title: book.title,
-        note: book.note,
-        time: Date.now() - Math.floor(Math.random() * 86400000 * 7),
-        station: STATIONS.find(s => s.id === stId)?.name || '',
-        journey: [STATIONS.find(s => s.id === stId)?.name || '']
-      }]);
-    }
-
-    // Moods
-    setStore('mood_' + stId, {
-      great: 3 + Math.floor(Math.random() * 10),
-      ok: 5 + Math.floor(Math.random() * 15),
-      meh: 2 + Math.floor(Math.random() * 8),
-      bad: 1 + Math.floor(Math.random() * 4)
-    });
-  });
-
-  setStore('seeded', true);
-}
-
-// ── Accident Data (jinshinjiko.com 2011-2026, ~350件) ──
+// ── Accident Data (jinshinjiko.com 2010-2026, 436件) ──
 const ACCIDENT_DATES = [
   // 2026 (7)
   "2026-03-25","2026-03-05","2026-03-01","2026-02-05","2026-01-26","2026-01-15","2026-01-11",
@@ -1198,7 +435,7 @@ const ACCIDENT_DATES = [
   "2021-12-30","2021-12-24","2021-12-19","2021-12-13","2021-10-25","2021-10-23","2021-10-15",
   "2021-09-26","2021-09-24","2021-09-12","2021-08-17","2021-07-18","2021-07-08","2021-06-28",
   "2021-06-22","2021-06-01","2021-05-27","2021-05-18","2021-04-23","2021-04-22","2021-04-18","2021-02-26",
-  // 2019 (12 ※1〜4月のみ)
+  // 2019 (12)
   "2019-04-04","2019-03-28","2019-03-24","2019-03-18","2019-03-16","2019-03-04","2019-02-25",
   "2019-02-22","2019-02-14","2019-02-10","2019-01-19","2019-01-18",
   // 2018 (31)
@@ -1249,7 +486,7 @@ const ACCIDENT_DATES = [
   "2011-01-03"
 ];
 
-// ── Shared: compute month/DOW factors (cached) ──
+// ── Compute month/DOW factors (cached) ──
 let _factors = null;
 function getFactors() {
   if (_factors) return _factors;
@@ -1290,6 +527,131 @@ function getPctColor(pct) {
   return '#e63946';
 }
 
+// ── Weather ──
+async function fetchWeather() {
+  try {
+    const res = await fetch(
+      'https://api.open-meteo.com/v1/forecast' +
+      '?latitude=35.73&longitude=139.71' +
+      '&current=temperature_2m,precipitation,weathercode,windspeed_10m' +
+      '&timezone=Asia%2FTokyo'
+    );
+    if (!res.ok) return null;
+    const json = await res.json();
+    const c = json.current;
+    return { code: c.weathercode, temp: c.temperature_2m, wind: c.windspeed_10m, precip: c.precipitation };
+  } catch { return null; }
+}
+
+function weatherMultiplier(code, temp, windKmh) {
+  const wind = windKmh / 3.6;
+  let mult = 1.0, icon, label;
+  if      (code === 0)   { icon='☀️';  label='快晴';     mult=1.00; }
+  else if (code <= 2)    { icon='🌤';  label='晴れ曇り'; mult=1.00; }
+  else if (code === 3)   { icon='☁️';  label='曇り';     mult=1.00; }
+  else if (code <= 48)   { icon='🌫';  label='霧';       mult=1.15; }
+  else if (code <= 55)   { icon='🌦';  label='霧雨';     mult=1.20; }
+  else if (code === 61)  { icon='🌧';  label='小雨';     mult=1.25; }
+  else if (code === 63)  { icon='🌧';  label='雨';       mult=1.40; }
+  else if (code <= 67)   { icon='🌧';  label='大雨';     mult=1.65; }
+  else if (code === 71)  { icon='🌨';  label='小雪';     mult=1.50; }
+  else if (code === 73)  { icon='❄️';  label='雪';       mult=1.85; }
+  else if (code <= 77)   { icon='❄️';  label='大雪';     mult=2.30; }
+  else if (code <= 82)   { icon='🌦';  label='にわか雨'; mult=1.30; }
+  else if (code <= 86)   { icon='🌨';  label='にわか雪'; mult=1.70; }
+  else                   { icon='⛈';  label='雷雨';     mult=1.55; }
+  if      (wind > 15) mult *= 1.30;
+  else if (wind > 10) mult *= 1.15;
+  else if (wind > 7)  mult *= 1.05;
+  if (temp > 35) mult *= 1.10;
+  return { icon, label, mult: Math.round(mult * 100) / 100 };
+}
+
+// ── 7-day Week Strip ──
+function renderWeekStrip() {
+  const WDS = ['日','月','火','水','木','金','土'];
+  const today = new Date();
+  let html = '';
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(today);
+    d.setDate(today.getDate() + i);
+    const pct = getPctForDate(d);
+    const col = getPctColor(pct);
+    const isToday = (i === 0);
+    html +=
+      `<div class="week-day${isToday ? ' wd-today' : ''}">` +
+        `<div class="wd-dow" style="color:${isToday ? 'var(--accent)' : 'var(--text2)'}">${WDS[d.getDay()]}</div>` +
+        `<div class="wd-date" style="color:${isToday ? '#fff' : 'var(--text2)'}">${d.getDate()}</div>` +
+        `<div class="wd-bar" style="background:${col}"></div>` +
+        `<div class="wd-pct" style="color:${col}">${Math.round(pct)}%</div>` +
+      `</div>`;
+  }
+  document.getElementById('weekStrip').innerHTML = html;
+}
+
+// ── Today's Risk ──
+async function renderRiskCard() {
+  const today = new Date();
+  const todayM = today.getMonth();
+  const todayD = today.getDay();
+  const { mF, dF, baseRate } = getFactors();
+  const mFactor = mF[todayM];
+  const dFactor = dF[todayD];
+  const WD = ['日','月','火','水','木','金','土'];
+  const MO = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
+
+  document.getElementById('riskHeroDate').textContent =
+    `${today.getFullYear()}年${MO[todayM]}${today.getDate()}日（${WD[todayD]}）`;
+
+  // Week strip immediately (no weather needed)
+  renderWeekStrip();
+
+  // Weather fetch
+  const wx = await fetchWeather();
+  const wm = wx ? weatherMultiplier(wx.code, wx.temp, wx.wind) : null;
+  const weatherFactor = wm ? wm.mult : 1.0;
+
+  const pct = Math.max(1, Math.min(40, baseRate * mFactor * dFactor * weatherFactor * 100));
+  const color    = pct < 8 ? '#2a9d8f' : pct < 12 ? '#e6a946' : pct < 18 ? '#f4845f' : '#e63946';
+  const levelLbl = pct < 8 ? '低め'    : pct < 12 ? '平均的'  : pct < 18 ? 'やや高め' : '高め';
+
+  // Hero number
+  const numEl = document.getElementById('riskHeroNum');
+  numEl.textContent = pct.toFixed(1);
+  numEl.style.color = color;
+
+  // Level badge
+  const lvlEl = document.getElementById('riskHeroLevel');
+  lvlEl.textContent = levelLbl;
+  lvlEl.style.color = color;
+
+  // Bar
+  document.getElementById('riskHeroBarFill').style.cssText =
+    `width:${Math.min(100,(pct/25)*100)}%;background:${color};height:100%;border-radius:4px;transition:width 0.8s cubic-bezier(.4,0,.2,1),background 0.3s`;
+
+  // Weather badge
+  const badge = document.getElementById('weatherBadge');
+  if (wm) {
+    const windMs = (wx.wind / 3.6).toFixed(1);
+    const multCol = wm.mult <= 1.05 ? 'var(--text2)' : wm.mult <= 1.3 ? '#e6a946' : wm.mult <= 1.7 ? '#f4845f' : '#e63946';
+    badge.innerHTML =
+      `<span class="wb-icon">${wm.icon}</span>` +
+      `<span><span class="wb-main">${wm.label}</span>　${wx.temp.toFixed(1)}°C　風${windMs}m/s　${wx.precip.toFixed(1)}mm</span>` +
+      `<span class="wb-mult">天候補正 <b style="color:${multCol}">×${wm.mult}</b></span>`;
+  } else {
+    badge.innerHTML = `<span class="wb-icon">&#x1F310;</span><span style="font-size:11px">天気データ取得不可（補正なし）</span>`;
+  }
+
+  // Factor chips
+  const mFr = Math.round(mFactor * 100) / 100;
+  const dFr = Math.round(dFactor * 100) / 100;
+  document.getElementById('riskFactors').innerHTML =
+    `<div class="risk-factor-chip">基本レート<span class="rfc-val">${(baseRate*100).toFixed(2)}%/日</span></div>` +
+    `<div class="risk-factor-chip">${MO[todayM]}傾向<span class="rfc-val">${mFr >= 1 ? '↑' : '↓'}×${mFr}</span></div>` +
+    `<div class="risk-factor-chip">${WD[todayD]}曜傾向<span class="rfc-val">${dFr >= 1 ? '↑' : '↓'}×${dFr}</span></div>` +
+    (wm ? `<div class="risk-factor-chip">天候補正<span class="rfc-val">${wm.icon}×${wm.mult}</span></div>` : '');
+}
+
 // ── Forecast Screen ──
 let _forecastRendered = false;
 function renderForecast() {
@@ -1299,19 +661,16 @@ function renderForecast() {
   const YEAR = 2026;
   const today = new Date();
   const MO = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
-  const WD  = ['日','月','火','水','木','金','土'];
-  const WD_FULL = ['日曜','月曜','火曜','水曜','木曜','金曜','土曜'];
+  const WD = ['日','月','火','水','木','金','土'];
 
   // ── Heatmap ──
   let hmHtml = '';
-
   for (let m = 0; m < 12; m++) {
-    const dim = new Date(YEAR, m + 1, 0).getDate(); // days in month
-    const firstDow = new Date(YEAR, m, 1).getDay(); // 0=Sun
+    const dim = new Date(YEAR, m + 1, 0).getDate();
+    const firstDow = new Date(YEAR, m, 1).getDay();
     hmHtml += `<div style="display:flex;align-items:center;gap:6px;margin-bottom:5px">`;
     hmHtml += `<div style="font-size:11px;color:var(--text2);width:24px;text-align:right;flex-shrink:0">${MO[m]}</div>`;
     hmHtml += `<div style="display:flex;gap:2px;flex:1">`;
-    // leading empty cells
     for (let e = 0; e < firstDow; e++) {
       hmHtml += `<div style="flex:1;max-width:14px;height:22px"></div>`;
     }
@@ -1326,12 +685,11 @@ function renderForecast() {
         `background:${col}`,
         `display:flex;align-items:center;justify-content:center`,
         `font-size:7px;color:rgba(255,255,255,0.85);font-weight:500;line-height:1`,
-        isPast  ? 'opacity:0.4'   : '',
+        isPast  ? 'opacity:0.4' : '',
         isToday ? 'outline:2px solid #fff;outline-offset:1px;z-index:1;position:relative' : ''
       ].filter(Boolean).join(';');
       hmHtml += `<div style="${style}" title="${m+1}/${d} ${pct.toFixed(1)}%">${d}</div>`;
     }
-    // trailing empty cells to fill row to 37 (max Sun offset 6 + 31 days)
     const total = firstDow + dim;
     for (let e = total; e < 37; e++) {
       hmHtml += `<div style="flex:1;max-width:14px;height:22px"></div>`;
@@ -1340,7 +698,6 @@ function renderForecast() {
   }
   document.getElementById('fcHeatmap').innerHTML = hmHtml;
 
-  // Legend
   document.getElementById('fcLegend').innerHTML =
     `<span class="fc-legend-cell" style="background:#2a9d8f"></span>〜8% 低め　` +
     `<span class="fc-legend-cell" style="background:#e6a946"></span>8〜12% 平均　` +
@@ -1350,7 +707,6 @@ function renderForecast() {
 
   // ── Monthly bar chart ──
   const curM = today.getMonth();
-  let mbHtml = '';
   const monthAvgs = [];
   for (let m = 0; m < 12; m++) {
     const dim = new Date(YEAR, m + 1, 0).getDate();
@@ -1359,6 +715,7 @@ function renderForecast() {
     monthAvgs.push(sum / dim);
   }
   const maxAvg = Math.max(...monthAvgs);
+  let mbHtml = '';
   for (let m = 0; m < 12; m++) {
     const avg = monthAvgs[m];
     const col = getPctColor(avg);
@@ -1389,10 +746,9 @@ function renderForecast() {
   }
   const dowAvgs = dowSums.map((s, i) => s / dowCounts[i]);
   const maxDow  = Math.max(...dowAvgs);
-  const MAX_BAR_PX = 52; // px — fits in 90px container with labels below
-  let dwHtml = '';
-  // Mon(1)→Sun(0) order for readability
+  const MAX_BAR_PX = 52;
   const dowOrder = [1,2,3,4,5,6,0];
+  let dwHtml = '';
   for (const dow of dowOrder) {
     const avg   = dowAvgs[dow];
     const col   = getPctColor(avg);
@@ -1408,158 +764,7 @@ function renderForecast() {
   document.getElementById('fcDowChart').innerHTML = dwHtml;
 }
 
-// ── Weather fetch (Open-Meteo, no key required) ──
-// Coordinates: Ikebukuro (center of Tobu Tojo Line)
-async function fetchWeather() {
-  try {
-    const res = await fetch(
-      'https://api.open-meteo.com/v1/forecast' +
-      '?latitude=35.73&longitude=139.71' +
-      '&current=temperature_2m,precipitation,weathercode,windspeed_10m' +
-      '&timezone=Asia%2FTokyo'
-    );
-    if (!res.ok) return null;
-    const json = await res.json();
-    const c = json.current;
-    return {
-      code:   c.weathercode,
-      temp:   c.temperature_2m,
-      wind:   c.windspeed_10m,   // km/h
-      precip: c.precipitation
-    };
-  } catch { return null; }
-}
-
-function weatherMultiplier(code, temp, windKmh) {
-  const wind = windKmh / 3.6; // → m/s
-  let mult = 1.0;
-  let icon, label;
-
-  if      (code === 0)              { icon='☀️';  label='快晴';     mult=1.00; }
-  else if (code <= 2)               { icon='🌤';  label='晴れ曇り'; mult=1.00; }
-  else if (code === 3)              { icon='☁️';  label='曇り';     mult=1.00; }
-  else if (code <= 48)              { icon='🌫';  label='霧';       mult=1.15; }
-  else if (code <= 55)              { icon='🌦';  label='霧雨';     mult=1.20; }
-  else if (code === 61)             { icon='🌧';  label='小雨';     mult=1.25; }
-  else if (code === 63)             { icon='🌧';  label='雨';       mult=1.40; }
-  else if (code <= 67)              { icon='🌧';  label='大雨';     mult=1.65; }
-  else if (code === 71)             { icon='🌨';  label='小雪';     mult=1.50; }
-  else if (code === 73)             { icon='❄️';  label='雪';       mult=1.85; }
-  else if (code <= 77)              { icon='❄️';  label='大雪';     mult=2.30; }
-  else if (code <= 82)              { icon='🌦';  label='にわか雨'; mult=1.30; }
-  else if (code <= 86)              { icon='🌨';  label='にわか雪'; mult=1.70; }
-  else                              { icon='⛈';  label='雷雨';     mult=1.55; }
-
-  // Wind penalty
-  if      (wind > 15) mult *= 1.30;
-  else if (wind > 10) mult *= 1.15;
-  else if (wind > 7)  mult *= 1.05;
-
-  // Heat penalty (rail expansion)
-  if (temp > 35) mult *= 1.10;
-
-  return { icon, label, mult: Math.round(mult * 100) / 100 };
-}
-
-// ── 7-day Week Strip ──
-function renderWeekStrip() {
-  const WDS = ['日','月','火','水','木','金','土'];
-  const today = new Date();
-  let html = '';
-  for (let i = 0; i < 7; i++) {
-    const d = new Date(today);
-    d.setDate(today.getDate() + i);
-    const pct = getPctForDate(d);
-    const col = getPctColor(pct);
-    const isToday = (i === 0);
-    html +=
-      `<div class="week-day${isToday ? ' wd-today' : ''}">` +
-        `<div class="wd-dow">${WDS[d.getDay()]}</div>` +
-        `<div class="wd-date" style="color:${isToday ? 'var(--accent)' : 'var(--text2)'}">${d.getDate()}</div>` +
-        `<div class="wd-bar" style="background:${col}"></div>` +
-        `<div class="wd-pct" style="color:${col}">${Math.round(pct)}%</div>` +
-      `</div>`;
-  }
-  document.getElementById('weekStrip').innerHTML = html;
-}
-
-// ── Compute & Render Today's Risk ──
-async function renderRiskCard() {
-  const today = new Date();
-  const todayM = today.getMonth();
-  const todayD = today.getDay();
-
-  const { mF, dF, baseRate } = getFactors();
-  const mFactor = mF[todayM];
-  const dFactor = dF[todayD];
-
-  const WD = ['日','月','火','水','木','金','土'];
-  const MO = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
-
-  // Date label
-  document.getElementById('riskHeroDate').textContent =
-    `${today.getFullYear()}年${MO[todayM]}${today.getDate()}日（${WD[todayD]}）`;
-
-  // Render week strip immediately (no weather needed)
-  renderWeekStrip();
-
-  // Fetch weather
-  const wx = await fetchWeather();
-  const wm = wx ? weatherMultiplier(wx.code, wx.temp, wx.wind) : null;
-  const weatherFactor = wm ? wm.mult : 1.0;
-
-  const pctRaw = baseRate * mFactor * dFactor * weatherFactor * 100;
-  const pct    = Math.max(1, Math.min(40, pctRaw));
-  const pctStr = pct.toFixed(1);
-
-  // Color / level
-  const color    = pct < 8 ? '#2a9d8f' : pct < 12 ? '#e6a946' : pct < 18 ? '#f4845f' : '#e63946';
-  const levelLbl = pct < 8 ? '低め'    : pct < 12 ? '平均的'  : pct < 18 ? 'やや高め' : '高め';
-
-  // Hero number
-  const numEl = document.getElementById('riskHeroNum');
-  numEl.textContent = pctStr;
-  numEl.style.color = color;
-
-  // Level badge
-  const lvlEl = document.getElementById('riskHeroLevel');
-  lvlEl.textContent = levelLbl;
-  lvlEl.style.color = color;
-
-  // Progress bar
-  const barW = Math.min(100, (pct / 25) * 100);
-  document.getElementById('riskHeroBarFill').style.cssText =
-    `width:${barW}%;background:${color};height:100%;border-radius:4px;transition:width 0.7s ease,background 0.3s`;
-
-  // Weather badge
-  const badge = document.getElementById('weatherBadge');
-  if (wm) {
-    const windMs = (wx.wind / 3.6).toFixed(1);
-    const multCol = wm.mult <= 1.05 ? 'var(--text2)'
-                  : wm.mult <= 1.3  ? '#e6a946'
-                  : wm.mult <= 1.7  ? '#f4845f'
-                  : '#e63946';
-    badge.innerHTML =
-      `<span class="wb-icon">${wm.icon}</span>` +
-      `<span><span class="wb-main">${wm.label}</span>　${wx.temp.toFixed(1)}°C　風${windMs}m/s</span>` +
-      `<span class="wb-mult">天候補正 <b style="color:${multCol}">×${wm.mult}</b></span>`;
-  } else {
-    badge.innerHTML = `<span class="wb-icon">&#x1F310;</span><span style="font-size:11px">天気データ取得不可（補正なし）</span>`;
-  }
-
-  // Factor chips
-  const mFr = Math.round(mFactor * 100) / 100;
-  const dFr = Math.round(dFactor * 100) / 100;
-  document.getElementById('riskFactors').innerHTML =
-    `<div class="risk-factor-chip">基本レート<span class="rfc-val">${(baseRate*100).toFixed(2)}%</span></div>` +
-    `<div class="risk-factor-chip">${MO[todayM]}傾向<span class="rfc-val">${mFr >= 1 ? '↑' : '↓'}×${mFr}</span></div>` +
-    `<div class="risk-factor-chip">${WD[todayD]}曜傾向<span class="rfc-val">${dFr >= 1 ? '↑' : '↓'}×${dFr}</span></div>` +
-    (wm ? `<div class="risk-factor-chip">天候補正<span class="rfc-val">${wm.icon}×${wm.mult}</span></div>` : '');
-}
-
 // ── Init ──
-seedDemoData();
-renderStationList();
 checkLateNight();
 renderRiskCard();
 setInterval(checkLateNight, 60000);
