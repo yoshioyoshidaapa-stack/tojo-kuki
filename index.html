@@ -505,6 +505,84 @@ const ACCIDENT_DATES = [
   "2011-01-03"
 ];
 
+// ── Japanese National Holiday Check ──
+function isNationalHoliday(date, depth) {
+  if (depth > 1) return null;
+  const y = date.getFullYear(), m = date.getMonth()+1, d = date.getDate(), w = date.getDay();
+  // Fixed
+  if (m===1  && d===1)  return '元日';
+  if (m===2  && d===11) return '建国記念日';
+  if (m===2  && d===23) return '天皇誕生日';
+  if (m===4  && d===29) return '昭和の日';
+  if (m===5  && d===3)  return '憲法記念日';
+  if (m===5  && d===4)  return 'みどりの日';
+  if (m===5  && d===5)  return 'こどもの日';
+  if (m===8  && d===11) return '山の日';
+  if (m===11 && d===3)  return '文化の日';
+  if (m===11 && d===23) return '勤労感謝の日';
+  // Moveable (nth Monday)
+  if (m===1  && w===1 && d>=8  && d<=14) return '成人の日';
+  if (m===7  && w===1 && d>=15 && d<=21) return '海の日';
+  if (m===9  && w===1 && d>=15 && d<=21) return '敬老の日';
+  if (m===10 && w===1 && d>=8  && d<=14) return 'スポーツの日';
+  // 春分・秋分 (approximate formula)
+  const sy = y - 1980;
+  if (m===3 && d===Math.floor(20.8431+0.242194*sy-Math.floor(sy/4))) return '春分の日';
+  if (m===9 && d===Math.floor(23.2488+0.242194*sy-Math.floor(sy/4))) return '秋分の日';
+  // 振替休日 (月曜、かつ前日日曜が祝日)
+  if (w===1) {
+    const prev = new Date(y, m-1, d-1);
+    if (prev.getDay()===0 && isNationalHoliday(prev, (depth||0)+1)) return '振替休日';
+  }
+  return null;
+}
+
+// ── Special Day Multiplier ──
+function getSpecialMultiplier(date) {
+  const y = date.getFullYear(), m = date.getMonth()+1, d = date.getDate(), dow = date.getDay();
+  let mult = 1.0;
+  const reasons = [];
+
+  const holiday = isNationalHoliday(date, 0);
+
+  // Count consecutive off-days immediately before today
+  let offDays = 0;
+  for (let i = 1; i <= 5; i++) {
+    const pd = new Date(y, m-1, d-i);
+    if (pd.getDay()===0 || pd.getDay()===6 || isNationalHoliday(pd, 0)) offDays++;
+    else break;
+  }
+
+  if (holiday) {
+    mult *= 0.88; reasons.push(holiday);
+  } else if (offDays >= 3) {
+    mult *= 1.25; reasons.push('連休明け');
+  } else if (offDays >= 1 && isNationalHoliday(new Date(y, m-1, d-1), 0)) {
+    mult *= 1.15; reasons.push('祝日明け');
+  }
+
+  // GW (4/29-5/5) & お盆 & 年末年始: commuter drop
+  if ((m===4 && d>=29)||(m===5 && d<=5))       { mult *= 0.82; reasons.push('GW'); }
+  if (m===8 && d>=13 && d<=16)                  { mult *= 0.82; reasons.push('お盆'); }
+  if ((m===12 && d>=29)||(m===1 && d<=3))       { mult *= 0.80; reasons.push('年末年始'); }
+
+  // 年度末 (3/20-31) ・新年度 (4/1-14): stress spike
+  if (m===3 && d>=20 && !holiday)               { mult *= 1.10; reasons.push('年度末'); }
+  if (m===4 && d<=14 && !holiday)               { mult *= 1.15; reasons.push('新年度'); }
+
+  // 花見 (3/25-4/15): crowded trains
+  if (((m===3&&d>=25)||(m===4&&d<=15))&&!holiday) { mult *= 1.08; reasons.push('花見'); }
+
+  // 川越まつり (10月第3土日)
+  if (m===10 && (dow===6||dow===0)) {
+    const firstSat = ((6 - new Date(y,9,1).getDay()+7)%7)+1;
+    const thirdSat = firstSat+14;
+    if (d===thirdSat||(dow===0&&d===thirdSat+1)) { mult *= 1.12; reasons.push('川越まつり'); }
+  }
+
+  return { mult: Math.round(mult*100)/100, reasons };
+}
+
 // ── Compute month/DOW factors (cached) ──
 let _factors = null;
 function getFactors() {
@@ -536,7 +614,8 @@ function getFactors() {
 
 function getPctForDate(date) {
   const { mF, dF, baseRate } = getFactors();
-  return Math.max(1, Math.min(35, baseRate * mF[date.getMonth()] * dF[date.getDay()] * 100));
+  const { mult } = getSpecialMultiplier(date);
+  return Math.max(1, Math.min(40, baseRate * mF[date.getMonth()] * dF[date.getDay()] * mult * 100));
 }
 
 function getPctColor(pct) {
@@ -630,7 +709,8 @@ async function renderRiskCard() {
   const wm = wx ? weatherMultiplier(wx.code, wx.temp, wx.wind) : null;
   const weatherFactor = wm ? wm.mult : 1.0;
 
-  const pct = Math.max(1, Math.min(40, baseRate * mFactor * dFactor * weatherFactor * 100));
+  const { mult: specialMult, reasons: specialReasons } = getSpecialMultiplier(today);
+  const pct = Math.max(1, Math.min(40, baseRate * mFactor * dFactor * specialMult * weatherFactor * 100));
   const color    = pct < 8 ? '#2a9d8f' : pct < 12 ? '#e6a946' : pct < 18 ? '#f4845f' : '#e63946';
   const levelLbl = pct < 8 ? '低め'    : pct < 12 ? '平均的'  : pct < 18 ? 'やや高め' : '高め';
 
@@ -668,7 +748,8 @@ async function renderRiskCard() {
     `<div class="risk-factor-chip">基本レート<span class="rfc-val">${(baseRate*100).toFixed(2)}%/日</span></div>` +
     `<div class="risk-factor-chip">${MO[todayM]}傾向<span class="rfc-val">${mFr >= 1 ? '↑' : '↓'}×${mFr}</span></div>` +
     `<div class="risk-factor-chip">${WD[todayD]}曜傾向<span class="rfc-val">${dFr >= 1 ? '↑' : '↓'}×${dFr}</span></div>` +
-    (wm ? `<div class="risk-factor-chip">天候補正<span class="rfc-val">${wm.icon}×${wm.mult}</span></div>` : '');
+    (wm ? `<div class="risk-factor-chip">天候補正<span class="rfc-val">${wm.icon}×${wm.mult}</span></div>` : '') +
+    (specialReasons.length ? `<div class="risk-factor-chip">${specialReasons.join('・')}<span class="rfc-val">${specialMult >= 1 ? '↑' : '↓'}×${specialMult}</span></div>` : '');
 }
 
 // ── Forecast Screen ──
