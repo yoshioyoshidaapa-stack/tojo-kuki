@@ -162,6 +162,32 @@
   .week-day .wd-bar { width: 30px; height: 4px; border-radius: 2px; }
   .week-day .wd-pct { font-size: 12px; font-weight: 700; }
 
+  /* Last accident strip */
+  .last-accident-strip {
+    margin: 12px 20px 0;
+    padding: 10px 14px;
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 12px; font-size: 12px; color: var(--text2);
+    display: flex; align-items: center; gap: 10px; min-height: 40px;
+  }
+  .las-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+  .las-hit  { color: var(--accent); }
+  .las-miss { color: var(--text2); }
+
+  /* Accuracy report */
+  .accuracy-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 12px 0;
+  }
+  .accuracy-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 12px; padding: 14px; text-align: center;
+  }
+  .accuracy-card .ac-num { font-size: 26px; font-weight: 700; }
+  .accuracy-card .ac-lbl { font-size: 11px; color: var(--text2); margin-top: 4px; line-height: 1.4; }
+  .accuracy-bar-row { display: flex; align-items: center; gap: 8px; margin: 6px 0; font-size: 12px; }
+  .accuracy-bar-track { flex:1; height:16px; background:var(--border); border-radius:3px; overflow:hidden; }
+  .accuracy-bar-fill  { height:100%; border-radius:3px; transition: width 0.7s ease; }
+
   /* Source line */
   .risk-src-line {
     margin: 14px 20px 0;
@@ -280,6 +306,12 @@
 
   <div class="week-strip" id="weekStrip"></div>
 
+  <!-- 最新事故確認ストリップ -->
+  <div class="last-accident-strip" id="lastAccidentStrip">
+    <span class="las-dot" style="background:var(--text2)"></span>
+    <span>最新事故データを確認中…</span>
+  </div>
+
   <div class="risk-src-line">
     人身事故（436件/16年）＋信号故障・車両故障等を含む推計<br>
     出典: <a href="https://jinshinjiko.com/routes/39" target="_blank">鉄道人身事故データベース</a>
@@ -375,6 +407,9 @@
       <strong style="color:#f4845f">12〜18%：やや高め</strong> ／
       <strong style="color:#e63946">18%〜：高め</strong>
     </p>
+
+    <h3>&#x1F4CA; 予測精度レポート（直近90日）</h3>
+    <div id="accuracyReport" style="color:var(--text2);font-size:13px">読み込み中…</div>
 
     <h3>データ出典</h3>
     <p>
@@ -864,9 +899,101 @@ function renderForecast() {
   document.getElementById('fcDowChart').innerHTML = dwHtml;
 }
 
+// ── Accuracy: fetch & render ──
+async function loadAccuracyData() {
+  try {
+    const res = await fetch('/api/accidents');
+    if (!res.ok) throw new Error(res.status);
+    const { dates, fetched } = await res.json();
+    if (!dates || dates.length === 0) throw new Error('no data');
+    renderLastAccident(dates, fetched);
+    renderAccuracyReport(dates);
+  } catch (e) {
+    document.getElementById('lastAccidentStrip').innerHTML =
+      `<span class="las-dot" style="background:var(--text2)"></span>` +
+      `<span style="font-size:11px">事故データ取得失敗（オフライン？）</span>`;
+  }
+}
+
+function renderLastAccident(dates, fetched) {
+  const strip = document.getElementById('lastAccidentStrip');
+  if (!dates.length) { strip.innerHTML = `<span>確認済み事故なし</span>`; return; }
+
+  const latest = dates[0]; // YYYY-MM-DD
+  const latestDate = new Date(latest + 'T00:00:00');
+  const pct = getPctForDate(latestDate);
+  const color = getPctColor(pct);
+  const isHigh = pct >= 12;
+  const { reasons } = getSpecialMultiplier(latestDate);
+
+  const fetchedAgo = Math.round((Date.now() - new Date(fetched)) / 60000);
+  const agoStr = fetchedAgo < 60 ? `${fetchedAgo}分前取得` : `${Math.floor(fetchedAgo/60)}時間前取得`;
+
+  const [y, m, d] = latest.split('-');
+  const dow = ['日','月','火','水','木','金','土'][latestDate.getDay()];
+
+  strip.innerHTML =
+    `<span class="las-dot" style="background:${color}"></span>` +
+    `<span>` +
+      `<span style="color:var(--text);font-weight:600">${y}/${m}/${d}（${dow}）に事故</span>　` +
+      `<span class="${isHigh ? 'las-hit' : 'las-miss'}">` +
+        `予測は「${pct.toFixed(1)}% ${isHigh ? 'やや高め以上 ✓' : '平均以下'}」` +
+      `</span>` +
+    `</span>` +
+    `<span style="margin-left:auto;font-size:10px;white-space:nowrap">${agoStr}</span>`;
+}
+
+function renderAccuracyReport(dates) {
+  const el = document.getElementById('accuracyReport');
+  if (!el) return;
+
+  const dateSet = new Set(dates);
+  const today = new Date();
+  const DAYS = 90;
+  const THRESHOLD = 12; // やや高め以上
+
+  let highRiskDays = 0, highRiskHits = 0;
+  let accidentDays = 0, accidentCaught = 0;
+  const dayResults = [];
+
+  for (let i = 1; i <= DAYS; i++) {
+    const d = new Date(today.getFullYear(), today.getMonth(), today.getDate() - i);
+    const iso = d.toISOString().slice(0, 10);
+    const pct = getPctForDate(d);
+    const isHigh = pct >= THRESHOLD;
+    const hadAccident = dateSet.has(iso);
+
+    if (isHigh) { highRiskDays++; if (hadAccident) highRiskHits++; }
+    if (hadAccident) { accidentDays++; if (isHigh) accidentCaught++; }
+    dayResults.push({ iso, pct, isHigh, hadAccident });
+  }
+
+  const precision = highRiskDays > 0 ? Math.round(highRiskHits / highRiskDays * 100) : 0;
+  const recall    = accidentDays  > 0 ? Math.round(accidentCaught / accidentDays * 100) : 0;
+  const precCol   = precision >= 40 ? 'var(--accent)' : precision >= 25 ? '#e6a946' : '#f4845f';
+  const recCol    = recall    >= 60 ? 'var(--accent)' : recall    >= 40 ? '#e6a946' : '#f4845f';
+
+  el.innerHTML =
+    `<div class="accuracy-grid">` +
+      `<div class="accuracy-card">` +
+        `<div class="ac-num" style="color:${precCol}">${precision}%</div>` +
+        `<div class="ac-lbl">適中率<br>「高め予測」の日に<br>実際に事故があった割合</div>` +
+      `</div>` +
+      `<div class="accuracy-card">` +
+        `<div class="ac-num" style="color:${recCol}">${recall}%</div>` +
+        `<div class="ac-lbl">検出率<br>事故が起きた日を<br>「高め」と予測できた割合</div>` +
+      `</div>` +
+    `</div>` +
+    `<div style="font-size:11px;color:var(--text2);line-height:1.8;margin-top:4px">` +
+      `直近${DAYS}日間 ／ 事故日数: ${accidentDays}日 ／ 「高め予測」日数: ${highRiskDays}日<br>` +
+      `閾値: ${THRESHOLD}%以上を「高め」と判定　出典: jinshinjiko.com（自動取得）` +
+    `</div>`;
+}
+
 // ── Init ──
 checkLateNight();
 renderRiskCard();
+loadAccuracyData();
 setInterval(checkLateNight, 60000);
 </script>
 
