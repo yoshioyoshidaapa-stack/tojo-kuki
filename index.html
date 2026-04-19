@@ -162,6 +162,31 @@
   .week-day .wd-bar { width: 30px; height: 4px; border-radius: 2px; }
   .week-day .wd-pct { font-size: 12px; font-weight: 700; }
 
+  /* Time-of-day risk chart */
+  .time-risk-wrap {
+    margin: 12px 20px 0;
+    padding: 14px 14px 10px;
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 12px;
+  }
+  .time-risk-header {
+    display: flex; justify-content: space-between; align-items: baseline;
+    margin-bottom: 10px;
+  }
+  .time-risk-header .trh-title { font-size: 11px; color: var(--text2); letter-spacing: 0.5px; }
+  .time-risk-header .trh-now   { font-size: 12px; font-weight: 700; }
+  .time-risk-bars { display: flex; gap: 2px; height: 52px; align-items: flex-end; }
+  .time-risk-bar  { flex: 1; border-radius: 2px 2px 0 0; min-height: 2px; transition: height 0.5s ease; }
+  .time-risk-bar.tr-now { outline: 2px solid #fff; outline-offset: 1px; position: relative; z-index: 1; }
+  .time-risk-xlabels {
+    display: flex; justify-content: space-between;
+    margin-top: 4px; font-size: 9px; color: var(--text2); padding: 0 1px;
+  }
+  .time-risk-footer {
+    margin-top: 10px; padding-top: 8px; border-top: 1px solid var(--border);
+    font-size: 11px; color: var(--text2);
+  }
+
   /* Last accident strip */
   .last-accident-strip {
     margin: 12px 20px 0;
@@ -305,6 +330,9 @@
   </div>
 
   <div class="week-strip" id="weekStrip"></div>
+
+  <!-- 時間帯別リスク -->
+  <div id="timeRiskSection"></div>
 
   <!-- 最新事故確認ストリップ -->
   <div class="last-accident-strip" id="lastAccidentStrip">
@@ -615,6 +643,18 @@ function getSpecialMultiplier(date) {
     if (d===thirdSat||(dow===0&&d===thirdSat+1)) { mult *= 1.12; reasons.push('川越まつり'); }
   }
 
+  // 月末プレッシャー（締め切り・精神的負荷）
+  if (!holiday && d >= 26)            { mult *= 1.08; reasons.push('月末'); }
+  else if (!holiday && d >= 22)       { mult *= 1.05; reasons.push('給料日前'); }
+
+  // 入試・テストシーズン
+  if      (m===1 && d>=13 && d<=15 && !holiday) { mult *= 1.10; reasons.push('共通テスト'); }
+  else if (m===2 && !holiday)                    { mult *= 1.07; reasons.push('入試シーズン'); }
+  else if (m===6 && d>=12 && d<=20 && !holiday)  { mult *= 1.04; reasons.push('中間テスト'); }
+  else if (m===7 && d<=12 && !holiday)            { mult *= 1.05; reasons.push('期末テスト'); }
+  else if (m===11 && d>=10 && d<=20 && !holiday)  { mult *= 1.04; reasons.push('期末テスト'); }
+  else if (m===1 && d>=20 && d<=31 && !holiday)   { mult *= 1.04; reasons.push('学年末テスト'); }
+
   return { mult: Math.round(mult*100)/100, reasons };
 }
 
@@ -666,13 +706,34 @@ async function fetchWeather() {
     const res = await fetch(
       'https://api.open-meteo.com/v1/forecast' +
       '?latitude=35.73&longitude=139.71' +
-      '&current=temperature_2m,precipitation,weathercode,windspeed_10m' +
+      '&current=temperature_2m,precipitation,weathercode,windspeed_10m,surface_pressure' +
+      '&hourly=surface_pressure' +
+      '&daily=temperature_2m_max,temperature_2m_min' +
+      '&past_hours=6&forecast_hours=1' +
+      '&past_days=1&forecast_days=1' +
       '&timezone=Asia%2FTokyo'
     );
     if (!res.ok) return null;
     const json = await res.json();
     const c = json.current;
-    return { code: c.weathercode, temp: c.temperature_2m, wind: c.windspeed_10m, precip: c.precipitation };
+    // hourly[0] = 6h前, hourly[6] = 現在時刻
+    const hp = json.hourly?.surface_pressure || [];
+    const pressure6hAgo = hp.length >= 7 ? hp[0] : null;
+    const pressureDelta = pressure6hAgo !== null
+      ? Math.round((c.surface_pressure - pressure6hAgo) * 10) / 10
+      : 0;
+    // 気温前日差: daily[0]=昨日, daily[1]=今日
+    const dMax = json.daily?.temperature_2m_max || [];
+    const dMin = json.daily?.temperature_2m_min || [];
+    const avgToday = dMax[1] != null ? (dMax[1] + dMin[1]) / 2 : null;
+    const avgYest  = dMax[0] != null ? (dMax[0] + dMin[0]) / 2 : null;
+    const tempDelta = (avgToday != null && avgYest != null)
+      ? Math.round((avgToday - avgYest) * 10) / 10 : null;
+    return {
+      code: c.weathercode, temp: c.temperature_2m,
+      wind: c.windspeed_10m, precip: c.precipitation,
+      pressure: c.surface_pressure, pressureDelta, tempDelta
+    };
   } catch { return null; }
 }
 
@@ -698,6 +759,37 @@ function weatherMultiplier(code, temp, windKmh) {
   else if (wind > 7)  mult *= 1.05;
   if (temp > 35) mult *= 1.10;
   return { icon, label, mult: Math.round(mult * 100) / 100 };
+}
+
+// ── Temperature Delta Multiplier ──
+function tempDeltaMultiplier(deltaC) {
+  const abs = Math.abs(deltaC);
+  const sign = deltaC >= 0 ? '+' : '';
+  if      (abs >= 10) return { mult: 1.15, label: `気温急変${sign}${deltaC}°C` };
+  else if (abs >= 7)  return { mult: 1.10, label: `気温大変${sign}${deltaC}°C` };
+  else if (abs >= 4)  return { mult: 1.05, label: `気温差${sign}${deltaC}°C` };
+  else                return { mult: 1.00, label: null };
+}
+
+// ── Pressure Multiplier ──
+function pressureMultiplier(hPa, delta6h) {
+  let mult = 1.0;
+  let icon, label;
+
+  // 絶対値
+  if      (hPa < 990)  { mult *= 1.15; icon = '🌀'; label = `発達低気圧 ${Math.round(hPa)}hPa`; }
+  else if (hPa < 1005) { mult *= 1.08; icon = '↙️'; label = `低気圧 ${Math.round(hPa)}hPa`; }
+  else if (hPa > 1020) { mult *= 0.95; icon = '🔵'; label = `高気圧 ${Math.round(hPa)}hPa`; }
+  else                 { mult *= 1.00; icon = '⬜'; label = `${Math.round(hPa)}hPa`; }
+
+  // 6時間変化トレンド（気象病の主因）
+  if      (delta6h <= -8) { mult *= 1.20; label += `　急落▼${Math.abs(delta6h)}hPa`; }
+  else if (delta6h <= -4) { mult *= 1.12; label += `　低下▼${Math.abs(delta6h)}hPa`; }
+  else if (delta6h <= -2) { mult *= 1.06; label += `　微低下▼${Math.abs(delta6h)}hPa`; }
+  else if (delta6h >=  3) { mult *= 0.97; label += `　上昇▲${delta6h}hPa`; }
+  else                    { label += `　変化${delta6h > 0 ? '+' : ''}${delta6h}hPa/6h`; }
+
+  return { mult: Math.round(mult * 100) / 100, icon, label };
 }
 
 // ── 7-day Week Strip ──
@@ -742,10 +834,14 @@ async function renderRiskCard() {
   // Weather fetch
   const wx = await fetchWeather();
   const wm = wx ? weatherMultiplier(wx.code, wx.temp, wx.wind) : null;
-  const weatherFactor = wm ? wm.mult : 1.0;
+  const pm = (wx && wx.pressure != null) ? pressureMultiplier(wx.pressure, wx.pressureDelta) : null;
+  const tm = (wx && wx.tempDelta != null) ? tempDeltaMultiplier(wx.tempDelta) : null;
+  const weatherFactor  = wm ? wm.mult : 1.0;
+  const pressureFactor = pm ? pm.mult : 1.0;
+  const tempFactor     = tm ? tm.mult : 1.0;
 
   const { mult: specialMult, reasons: specialReasons } = getSpecialMultiplier(today);
-  const pct = Math.max(1, Math.min(40, baseRate * mFactor * dFactor * specialMult * weatherFactor * 100));
+  const pct = Math.max(1, Math.min(40, baseRate * mFactor * dFactor * specialMult * weatherFactor * pressureFactor * tempFactor * 100));
   const color    = pct < 8 ? '#2a9d8f' : pct < 12 ? '#e6a946' : pct < 18 ? '#f4845f' : '#e63946';
   const levelLbl = pct < 8 ? '低め'    : pct < 12 ? '平均的'  : pct < 18 ? 'やや高め' : '高め';
 
@@ -767,11 +863,15 @@ async function renderRiskCard() {
   const badge = document.getElementById('weatherBadge');
   if (wm) {
     const windMs = (wx.wind / 3.6).toFixed(1);
-    const multCol = wm.mult <= 1.05 ? 'var(--text2)' : wm.mult <= 1.3 ? '#e6a946' : wm.mult <= 1.7 ? '#f4845f' : '#e63946';
+    const combined = Math.round(wm.mult * pressureFactor * 100) / 100;
+    const multCol = combined <= 1.05 ? 'var(--text2)' : combined <= 1.3 ? '#e6a946' : combined <= 1.7 ? '#f4845f' : '#e63946';
     badge.innerHTML =
       `<span class="wb-icon">${wm.icon}</span>` +
-      `<span><span class="wb-main">${wm.label}</span>　${wx.temp.toFixed(1)}°C　風${windMs}m/s　${wx.precip.toFixed(1)}mm</span>` +
-      `<span class="wb-mult">天候補正 <b style="color:${multCol}">×${wm.mult}</b></span>`;
+      `<span>` +
+        `<span class="wb-main">${wm.label}</span>　${wx.temp.toFixed(1)}°C　風${windMs}m/s` +
+        (pm ? `　<span style="font-size:11px;color:var(--text2)">${pm.icon} ${pm.label}</span>` : '') +
+      `</span>` +
+      `<span class="wb-mult">天候補正 <b style="color:${multCol}">×${combined}</b></span>`;
   } else {
     badge.innerHTML = `<span class="wb-icon">&#x1F310;</span><span style="font-size:11px">天気データ取得不可（補正なし）</span>`;
   }
@@ -784,7 +884,9 @@ async function renderRiskCard() {
     `<div class="risk-factor-chip">${MO[todayM]}傾向<span class="rfc-val">${mFr >= 1 ? '↑' : '↓'}×${mFr}</span></div>` +
     `<div class="risk-factor-chip">${WD[todayD]}曜傾向<span class="rfc-val">${dFr >= 1 ? '↑' : '↓'}×${dFr}</span></div>` +
     (wm ? `<div class="risk-factor-chip">天候補正<span class="rfc-val">${wm.icon}×${wm.mult}</span></div>` : '') +
-    (specialReasons.length ? `<div class="risk-factor-chip">${specialReasons.join('・')}<span class="rfc-val">${specialMult >= 1 ? '↑' : '↓'}×${specialMult}</span></div>` : '');
+    (specialReasons.length ? `<div class="risk-factor-chip">${specialReasons.join('・')}<span class="rfc-val">${specialMult >= 1 ? '↑' : '↓'}×${specialMult}</span></div>` : '') +
+    (pm ? `<div class="risk-factor-chip">気圧<span class="rfc-val">${pm.icon}×${pm.mult}</span></div>` : '') +
+    (tm && tm.label ? `<div class="risk-factor-chip">気温差<span class="rfc-val">±×${tm.mult}</span></div>` : '');
 }
 
 // ── Forecast Screen ──
@@ -900,12 +1002,71 @@ function renderForecast() {
 }
 
 // ── Accuracy: fetch & render ──
+// ── Time-of-day Risk Chart ──
+function renderTimeRisk(hourly) {
+  const section = document.getElementById('timeRiskSection');
+  if (!section || !hourly) return;
+  const max = Math.max(...hourly);
+  if (max === 0) return;
+
+  const curHour = new Date().getHours();
+  const MAX_PX = 52;
+
+  // 24本のバー
+  let barsHtml = '';
+  for (let h = 0; h < 24; h++) {
+    const ratio = hourly[h] / max;
+    const px    = Math.max(2, Math.round(ratio * MAX_PX));
+    const isNow = h === curHour;
+    const col   = ratio > 0.65 ? '#e63946'
+                : ratio > 0.35 ? '#f4845f'
+                : ratio > 0.15 ? '#e6a946'
+                : '#2a9d8f';
+    barsHtml +=
+      `<div class="time-risk-bar${isNow ? ' tr-now' : ''}"` +
+      ` style="height:${px}px;background:${col}"` +
+      ` title="${h}時台: ${hourly[h]}件"></div>`;
+  }
+
+  // 現在時刻の水準
+  const curRatio = hourly[curHour] / max;
+  const curCol   = curRatio > 0.65 ? '#e63946' : curRatio > 0.35 ? '#f4845f' : curRatio > 0.15 ? '#e6a946' : '#2a9d8f';
+  const curLabel = curRatio > 0.65 ? '⚠️ 高め'
+                 : curRatio > 0.35 ? '△ やや高め'
+                 : curRatio > 0.15 ? '— 平均的'
+                 : '✓ 低め';
+
+  // ピーク時間帯（上位2つ）
+  const peaks = [...hourly.map((v,i) => ({v,i}))]
+    .sort((a,b) => b.v - a.v)
+    .slice(0, 3)
+    .map(x => `${x.i}時台`)
+    .join('・');
+
+  section.innerHTML =
+    `<div class="time-risk-wrap">` +
+      `<div class="time-risk-header">` +
+        `<span class="trh-title">&#x23F1; 時間帯別 過去事故分布</span>` +
+        `<span class="trh-now" style="color:${curCol}">今（${curHour}時台）${curLabel}</span>` +
+      `</div>` +
+      `<div class="time-risk-bars">${barsHtml}</div>` +
+      `<div class="time-risk-xlabels">` +
+        `<span>0時</span><span>6時</span><span>12時</span><span>18時</span><span>23時</span>` +
+      `</div>` +
+      `<div class="time-risk-footer">` +
+        `ピーク: <strong style="color:var(--text)">${peaks}</strong>` +
+        `<span style="float:right;font-size:10px">白枠 = 現在時刻</span>` +
+      `</div>` +
+    `</div>`;
+}
+
 async function loadAccuracyData() {
   try {
     const res = await fetch('/api/accidents');
     if (!res.ok) throw new Error(res.status);
-    const { dates, fetched } = await res.json();
+    const { dates, fetched, hourlyDistribution } = await res.json();
     if (!dates || dates.length === 0) throw new Error('no data');
+    renderTimeRisk(hourlyDistribution);
     renderLastAccident(dates, fetched);
     renderAccuracyReport(dates);
   } catch (e) {
